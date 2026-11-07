@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static shop_tags %}
+{% block title %}Про кухню — {{ site.name }}, доставка їжі у {{ site.city_loc }}{% endblock %}
+{% block meta_description %}Хто готує {{ site.name }}: невелика кухня в центрі {{ site.city_gen }}, власні соуси й тісто, 24 страви в меню, доставка 40–60 хв.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="wrap page-head-inner">
+        <span class="eyebrow">Про кухню</span>
+        <h1>Готуємо так, як їли б самі</h1>
+        <p class="lead">{{ site.name }} — це одна кухня в центрі {{ site.city_gen }} і невелика команда,
+           яка щодня робить тісто, соуси й десерти з нуля. Без напівфабрикатів, без «розігріти
+           в мікрохвильовці» — страва починається після вашого замовлення.</p>
+        <div class="stats-row">
+            <div class="stat"><strong>з 2019</strong><span>року на кухні</span></div>
+            <div class="stat"><strong>24</strong><span>страви в меню</span></div>
+            <div class="stat"><strong>40–60 хв</strong><span>доставка містом</span></div>
+            <div class="stat"><strong>4,8</strong><span>середня оцінка</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="story-grid">
+        <div class="prose">
+            <h2>Як усе почалося</h2>
+            <p>Спершу це була кухня на 12 квадратів і дві піци в меню: маргарита й пепероні.
+               Замовлення приймали в месенджері, адреси записували в зошит, а курʼєром був
+               хтось із нас. За перший місяць зробили 180 замовлень — і зрозуміли, що головне
+               не кількість позицій, а те, що кожну з них хочеться повторити.</p>
+            <p>Зараз у меню 24 страви, і ми свідомо тримаємо його коротким: піца, суші, бургери,
+               салати, перше, десерти й напої. Якщо позиція не продається — прибираємо, а не
+               тягнемо роками «для асортименту».</p>
+
+            <h2>Що робимо самі</h2>
+            <ul class="check-list">
+                <li><strong>Тісто</strong> — замішуємо щоранку, холодна ферментація 24 години.</li>
+                <li><strong>Соуси</strong> — томатний, цезар, спайсі, унагі. Усе на кухні, без
+                    готових сумішей.</li>
+                <li><strong>Бульйон для борщу</strong> — варимо на яловичих кістках 5 годин,
+                    тому борщ їде до вас гарячим, а не «зігрітим».</li>
+                <li><strong>Десерти</strong> — чізкейки й тірамісу збираємо щодня малими партіями.</li>
+            </ul>
+
+            <h2>Порції та чесність</h2>
+            <p>У картці кожної страви вказана вага або обʼєм і склад. Якщо на кухні закінчилися
+               порції — позиція одразу позначається «Немає», а не зникає з меню мовчки: видно,
+               що страва є, просто сьогодні її вже розібрали.</p>
+        </div>
+
+        <aside class="story-aside">
+            <div class="photo-stack">
+                <img src="{% static 'store/menu/borscht.jpg' %}" alt="Борщ український" loading="lazy">
+                <img src="{% static 'store/menu/pizza-margherita.jpg' %}" alt="Піца Маргарита" loading="lazy">
+                <img src="{% static 'store/menu/tiramisu.jpg' %}" alt="Тірамісу" loading="lazy">
+            </div>
+            <div class="note-card">
+                <h3>Їжа як у дома, тільки без миття посуду</h3>
+                <p>Доставка по {{ site.city_dat }} 40–60 хвилин, самовивіз — за 15–20 хвилин
+                   з {{ site.address }}.</p>
+                <a class="btn btn-accent" href="{% url 'store:index' %}#menu">Подивитися меню</a>
+            </div>
+        </aside>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="section-head"><h2>Як ми готуємо</h2></div>
+    <div class="step-grid">
+        <div class="step-card">
+            <span class="step-num">01</span>
+            <h3>Замовлення</h3>
+            <p>Страва потрапляє на кухню в момент оформлення. До цього вона — лише складники.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-num">02</span>
+            <h3>Кухня</h3>
+            <p>Піца — 6 хвилин у печі за 400 °C. Роли крутимо руками, супи розігріваємо порційно.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-num">03</span>
+            <h3>Пакування</h3>
+            <p>Піца їде в картонній коробці з отворами, суші — в холодній сумці з холодоелементом.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-num">04</span>
+            <h3>Доставка</h3>
+            <p>Курʼєр везе замовлення від 20 до 60 хвилин залежно від району. Ви бачите статус
+               у «Моїх замовленнях».</p>
+        </div>
+    </div>
+</section>
+
+<section class="wrap">
+    <div class="cta-strip">
+        <div>
+            <h2>Голодні? Меню вже готове</h2>
+            <p>24 страви, доставка по {{ site.city_dat }} від {{ min_order|money }}.</p>
+        </div>
+        <a class="btn btn-accent btn-lg" href="{% url 'store:index' %}#menu">До меню</a>
+    </div>
+</section>
+{% endblock %}

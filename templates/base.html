@@ -1,0 +1,160 @@
+{% load static shop_tags %}<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{{ site.name }} — {{ site.tagline }} у {{ site.city_loc }}{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}{{ site.name }} — готуємо піцу, суші, бургери й десерти після замовлення. Доставка по {{ site.city_dat }} 40–60 хв, безкоштовно від {{ free_shipping_from|money }}.{% endblock %}">
+    <meta name="keywords" content="{{ site.keywords }}">
+    <link rel="canonical" href="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    <meta name="theme-color" content="#E4572E">
+
+    <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+    <meta property="og:site_name" content="{{ site.name }}">
+    <meta property="og:locale" content="uk_UA">
+    <meta property="og:title" content="{% block og_title %}{{ site.name }} — {{ site.tagline }} у {{ site.city_loc }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ site.name }} — доставка їжі по {{ site.city_dat }}: піца, суші, бургери, десерти. 40–60 хв, безкоштовно від {{ free_shipping_from|money }}.{% endblock %}">
+    <meta property="og:url" content="{{ request.scheme }}://{{ request.get_host }}{{ request.path }}">
+    {% block og_image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{% static 'store/img/og-cover.jpg' %}">{% endblock %}
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" href="{% static 'store/img/favicon.svg' %}" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{% static 'store/img/favicon.svg' %}">
+    <link rel="stylesheet" href="{% static 'store/vendor/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'store/css/site.css' %}">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FoodEstablishment",
+      "name": "{{ site.name }}",
+      "description": "{{ site.name }} — доставка їжі у {{ site.city_loc }}. Піца, суші, бургери, салати, десерти й напої.",
+      "servesCuisine": ["Піца", "Суші", "Бургери", "Українська"],
+      "priceRange": "₴₴",
+      "telephone": "{{ site.phone_link }}",
+      "email": "{{ site.email }}",
+      "url": "{{ request.scheme }}://{{ request.get_host }}/",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "вул. Сумська, 24",
+        "addressLocality": "{{ site.city }}",
+        "addressCountry": "UA"
+      },
+      "openingHoursSpecification": {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"],
+        "opens": "10:00",
+        "closes": "22:00"
+      },
+      "hasDeliveryMethod": "http://purl.org/goodrelations/v1#DeliveryModeOwnFleet",
+      "areaServed": "{{ site.city }}"
+    }
+    </script>
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+<div class="promo-bar">
+    <div class="wrap promo-inner">
+        <span>Готуємо після замовлення</span>
+        <span class="promo-sep">•</span>
+        <span>Доставка по {{ site.city_dat }} 40–60 хв</span>
+        <span class="promo-sep">•</span>
+        <span>Безкоштовно від {{ free_shipping_from|money }}</span>
+    </div>
+</div>
+
+<header class="site-header">
+    <div class="wrap header-inner">
+        <a class="logo" href="{% url 'store:index' %}">
+            <span class="logo-mark" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M3 11.5h18a9 9 0 0 1-18 0Z" fill="currentColor"/>
+                    <path d="M8.5 8c0-2 1.6-2 1.6-4M13.9 8c0-2 1.6-2 1.6-4" stroke="currentColor"
+                          stroke-width="1.7" stroke-linecap="round"/>
+                </svg>
+            </span>
+            <span class="logo-text">{{ site.name }}<small>{{ site.tagline }}</small></span>
+        </a>
+
+        <nav class="main-nav">
+            <a href="{% url 'store:index' %}#menu">Меню</a>
+            <a href="{% url 'store:delivery' %}">Доставка</a>
+            <a href="{% url 'store:about' %}">Про кухню</a>
+            <a href="{% url 'store:contacts' %}">Контакти</a>
+        </nav>
+
+        <form class="head-search" method="get" action="{% url 'store:index' %}">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/>
+                <path d="m16.5 16.5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input type="search" name="q" value="{{ query|default:'' }}" placeholder="Піца, суші, напої…">
+        </form>
+
+        <a class="cart-btn" href="{% url 'store:cart' %}">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M4 5h2l2.2 10.5a2 2 0 0 0 2 1.5h7.4a2 2 0 0 0 2-1.6L21 8H7"
+                      stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="10" cy="20" r="1.6" fill="currentColor"/>
+                <circle cx="18" cy="20" r="1.6" fill="currentColor"/>
+            </svg>
+            <span class="cart-label">Кошик</span>
+            {% if cart_count %}<span class="cart-count">{{ cart_count }}</span>{% endif %}
+        </a>
+    </div>
+</header>
+
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="site-footer">
+    <div class="wrap footer-grid">
+        <div class="footer-brand">
+            <a class="logo" href="{% url 'store:index' %}">
+                <span class="logo-mark" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M3 11.5h18a9 9 0 0 1-18 0Z" fill="currentColor"/>
+                        <path d="M8.5 8c0-2 1.6-2 1.6-4M13.9 8c0-2 1.6-2 1.6-4" stroke="currentColor"
+                              stroke-width="1.7" stroke-linecap="round"/>
+                    </svg>
+                </span>
+                <span class="logo-text">{{ site.name }}<small>{{ site.tagline }}</small></span>
+            </a>
+            <p>Невелика кухня в центрі {{ site.city_gen }}. Готуємо після замовлення і привозимо
+               гарячим — без напівфабрикатів і довгого очікування.</p>
+        </div>
+        <div class="footer-col">
+            <h4>Клієнтам</h4>
+            <ul>
+                <li><a href="{% url 'store:delivery' %}">Доставка й оплата</a></li>
+                <li><a href="{% url 'store:about' %}">Про кухню</a></li>
+                <li><a href="{% url 'store:contacts' %}">Контакти</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Доставка</h4>
+            <ul>
+                <li>По {{ site.city_dat }} — 40–60 хв</li>
+                <li>Від {{ free_shipping_from|money }} — безкоштовно</li>
+                <li>Мінімальне замовлення {{ min_order|money }}</li>
+                <li>Самовивіз: {{ site.address }}</li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Контакти</h4>
+            <ul>
+                <li><a href="tel:{{ site.phone_link }}">{{ site.phone }}</a></li>
+                <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+                <li>{{ site.hours }}</li>
+                <li>{{ site.address }}</li>
+            </ul>
+        </div>
+    </div>
+    <div class="wrap footer-bottom">
+        <span>© {{ site.year }} {{ site.name }} — доставка їжі у {{ site.city_loc }}.</span>
+        <span>Ціни вказані в гривнях, ПДВ включено.</span>
+    </div>
+</footer>
+<script src="{% static 'store/vendor/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

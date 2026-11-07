@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% block title %}Контакти — {{ site.name }}, {{ site.address }}{% endblock %}
+{% block meta_description %}Телефон, адреса й графік роботи {{ site.name }}: {{ site.address }}. Приймаємо замовлення {{ site.hours|lower }}.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="wrap page-head-inner">
+        <span class="eyebrow">Контакти</span>
+        <h1>Ми на звʼязку щодня</h1>
+        <p class="lead">Найшвидше — телефоном: слухавку бере людина з кухні, а не робот.
+           Дзвоніть, якщо хочете щось уточнити, — або пишіть на пошту.</p>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="info-grid">
+        <a class="info-card info-card-link" href="tel:{{ site.phone_link }}">
+            <span class="info-label">Телефон</span>
+            <h3>{{ site.phone }}</h3>
+            <p>Приймаємо замовлення і питання щодо вже оформлених.</p>
+        </a>
+        <a class="info-card info-card-link" href="mailto:{{ site.email }}">
+            <span class="info-label">Email</span>
+            <h3>{{ site.email }}</h3>
+            <p>Для співпраці, рахунків і відгуків — відповідаємо протягом дня.</p>
+        </a>
+        <div class="info-card">
+            <span class="info-label">Кухня й самовивіз</span>
+            <h3>{{ site.address }}</h3>
+            <p>Вхід з двору, є парковка на 3 машини. Самовивіз — 15–20 хвилин після замовлення.</p>
+        </div>
+        <div class="info-card">
+            <span class="info-label">Графік роботи</span>
+            <h3>{{ site.hours }}</h3>
+            <p>Останнє замовлення приймаємо о 21:30, доставляємо до 22:00.</p>
+        </div>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="section-head"><h2>Де ми знаходимось</h2></div>
+    <div class="map-card">
+        <div class="map-frame">
+            <iframe
+                title="{{ site.name }} на карті"
+                src="https://www.google.com/maps?q={{ site.map_query|urlencode }}&output=embed"
+                loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+        <div class="map-side">
+            <h3>{{ site.name }} · кухня</h3>
+            <ul class="plain-list">
+                <li><strong>Адреса:</strong> {{ site.address }}</li>
+                <li><strong>Метро:</strong> Університет, 7 хвилин пішки</li>
+                <li><strong>Графік:</strong> {{ site.hours }}</li>
+                <li><strong>Телефон:</strong> <a href="tel:{{ site.phone_link }}">{{ site.phone }}</a></li>
+            </ul>
+            <p class="map-note">Якщо карта не завантажилась — відкрийте
+               <a href="https://www.google.com/maps/search/{{ site.map_query|urlencode }}"
+                  target="_blank" rel="noopener nofollow">адресу в Google Maps</a>.</p>
+        </div>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="section-head"><h2>Кому що писати</h2></div>
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>Замовлення й доставка</h3>
+            <p>Телефон {{ site.phone }} — склад замовлення, час доставки, статус.</p>
+        </div>
+        <div class="info-card">
+            <h3>Співпраця й корпоративні замовлення</h3>
+            <p><a href="mailto:{{ site.email }}">{{ site.email }}</a> — обіди в офіс, кейтеринг,
+               постійні замовлення.</p>
+        </div>
+        <div class="info-card">
+            <h3>Скарги й пропозиції</h3>
+            <p>Пишіть на <a href="mailto:{{ site.email }}">{{ site.email }}</a> — читає власник кухні.
+               Відповідаємо навіть на неприємні листи.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

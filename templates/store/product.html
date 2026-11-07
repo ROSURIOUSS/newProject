@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load shop_tags %}
+{% block title %}{{ product.name }} — {{ product.category.name }} з доставкою у {{ site.city_loc }} · {{ site.name }}{% endblock %}
+{% block meta_description %}{{ product.short }} — {{ product.name }}{% if product.weight %}, {{ product.weight }}{% endif %}. {{ product.price|money }}, доставка по {{ site.city_dat }} 40–60 хв.{% endblock %}
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ product.name }} — {{ site.name }}{% endblock %}
+{% block og_description %}{{ product.short }}. {{ product.price|money }}{% if product.weight %} · {{ product.weight }}{% endif %}{% endblock %}
+{% block og_image %}{% if product.image %}<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}">{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block head_extra %}
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": "{{ product.name|escapejs }}",
+      "description": "{{ product.short|escapejs }}",
+      "category": "{{ product.category.name|escapejs }}",
+      "image": "{{ request.scheme }}://{{ request.get_host }}{{ product.image.url }}",
+      "brand": {"@type": "Brand", "name": "{{ site.name }}"},
+      "offers": {
+        "@type": "Offer",
+        "price": "{{ product.price }}",
+        "priceCurrency": "UAH",
+        "availability": "{% if product.stock > 0 %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+        "url": "{{ request.scheme }}://{{ request.get_host }}{{ product.get_absolute_url }}"
+      }
+    }
+    </script>
+{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <nav class="breadcrumbs">
+        <a href="{% url 'store:index' %}">Меню</a>
+        <span>/</span>
+        <a href="{% url 'store:index' %}?category={{ product.category.slug }}#menu">{{ product.category.name }}</a>
+        <span>/</span>
+        <span class="current">{{ product.name }}</span>
+    </nav>
+
+    <div class="product-page">
+        <div class="product-gallery">
+            <div class="gallery-main">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% endif %}
+                {% if product.discount_percent %}<span class="badge badge-sale badge-abs">−{{ product.discount_percent }}%</span>{% endif %}
+            </div>
+        </div>
+
+        <div class="product-info">
+            <span class="card-cat">{{ product.category.name }}</span>
+            <h1>{{ product.name }}</h1>
+            {% if product.short %}<p class="product-short">{{ product.short }}</p>{% endif %}
+
+            <div class="product-price">
+                <span class="price price-lg">{{ product.price|money }}</span>
+                {% if product.old_price %}<s class="price-old">{{ product.old_price|money }}</s>{% endif %}
+                {% if product.weight %}<span class="weight-tag">{{ product.weight }}</span>{% endif %}
+            </div>
+
+            <div class="stock-line">
+                {% if product.stock > 0 %}
+                    <span class="dot dot-green"></span> Готуємо на замовлення — залишилось {{ product.stock }} порцій
+                {% else %}
+                    <span class="dot dot-red"></span> Сьогодні закінчилось
+                {% endif %}
+            </div>
+
+            {% if product.stock > 0 %}
+            <form class="buy-form" method="post" action="{% url 'store:cart_add' product.id %}">
+                {% csrf_token %}
+                <div class="qty-input">
+                    <button type="button" class="qty-btn" data-qty="-1">−</button>
+                    <input type="number" name="qty" value="1" min="1" max="{{ product.stock }}" inputmode="numeric">
+                    <button type="button" class="qty-btn" data-qty="1">+</button>
+                </div>
+                <button class="btn btn-accent btn-lg" type="submit">Додати в кошик</button>
+            </form>
+            <a class="btn btn-ghost btn-block" href="{% url 'store:cart' %}">Перейти до кошика →</a>
+            {% else %}
+            <button class="btn btn-ghost btn-lg" disabled>Немає в наявності</button>
+            {% endif %}
+
+            <ul class="perks">
+                <li><span class="perk-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 17h11V5H4zM15 9h3.5l2.5 3v5h-6z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><circle cx="7.5" cy="18.5" r="1.8" stroke="currentColor" stroke-width="1.7"/><circle cx="17" cy="18.5" r="1.8" stroke="currentColor" stroke-width="1.7"/></svg></span> Доставка по Харкову 40–60 хв</li>
+                <li><span class="perk-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3c1.5 2.2 4.5 4 4.5 7.5A4.5 4.5 0 0 1 12 15a4.5 4.5 0 0 1-4.5-4.5C7.5 7 10.5 5.2 12 3Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 19h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></span> Готуємо після замовлення, без напівфабрикатів</li>
+                <li><span class="perk-ico"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 10h19" stroke="currentColor" stroke-width="1.7"/></svg></span> Готівкою, карткою курʼєру або онлайн</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="product-tabs">
+        <section class="tabs-block">
+            <h2>Опис</h2>
+            <p>{{ product.description|linebreaksbr }}</p>
+        </section>
+        {% if product.ingredients or product.weight %}
+        <section class="tabs-block">
+            <h2>Склад і порція</h2>
+            <dl class="spec-list">
+                {% if product.weight %}<div><dt>Вага / обʼєм</dt><dd>{{ product.weight }}</dd></div>{% endif %}
+                {% if product.ingredients %}<div><dt>Склад</dt><dd>{{ product.ingredients }}</dd></div>{% endif %}
+                <div><dt>Категорія</dt><dd>{{ product.category.name }}</dd></div>
+            </dl>
+        </section>
+        {% endif %}
+    </div>
+
+    {% if related %}
+    <section class="section">
+        <div class="section-head"><h2>До цього часто беруть</h2></div>
+        <div class="product-grid product-grid-3">
+            {% for product in related %}{% include 'store/_card.html' %}{% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+
+<script>
+    document.querySelectorAll('.qty-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var input = btn.parentElement.querySelector('input');
+            var next = (parseInt(input.value) || 1) + parseInt(btn.dataset.qty);
+            input.value = Math.min(Math.max(next, 1), parseInt(input.max) || 99);
+        });
+    });
+</script>
+{% endblock %}

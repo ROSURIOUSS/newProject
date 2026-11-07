@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load shop_tags %}
+{% block title %}Замовлення {{ order.number }} прийнято — СМАК{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="success">
+        <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none"><path d="m4 12.5 5.5 5.5L20 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h1>Дякуємо, {{ order.name }}!</h1>
+        <p class="success-sub">Замовлення <strong>{{ order.number }}</strong> прийнято. Ми вже готуємо —
+            курʼєр подзвонить за номером {{ order.phone }}.</p>
+
+        <div class="success-box">
+            <div class="summary-row"><span>Статус</span><strong>{{ order.get_status_display }}</strong></div>
+            <div class="summary-row"><span>Як отримаєте</span><strong>{{ order.get_delivery_display }}</strong></div>
+            {% if order.address %}
+            <div class="summary-row"><span>Адреса</span><strong>{{ order.address }}</strong></div>
+            {% endif %}
+            <div class="summary-row"><span>Коли</span><strong>{{ order.get_time_slot_display }}</strong></div>
+            <div class="summary-row"><span>Оплата</span><strong>{{ order.get_payment_display }}</strong></div>
+            <div class="summary-total"><span>Сума</span><strong>{{ order.total|money }}</strong></div>
+        </div>
+
+        <div class="success-items">
+            {% for item in order.items.all %}
+            <div class="summary-item"><span>{{ item.name }} × {{ item.qty }}</span><strong>{{ item.line_total|money }}</strong></div>
+            {% endfor %}
+        </div>
+
+        <a class="btn btn-accent btn-lg" href="{% url 'store:index' %}#menu">Повернутись до меню</a>
+    </div>
+</div>
+{% endblock %}

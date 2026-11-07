@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static shop_tags %}
+{% block title %}{{ site.name }} — доставка їжі у {{ site.city_loc }} · піца, суші, бургери{% endblock %}
+
+{% block content %}
+{% if not query and not selected_category and not price_min and not price_max %}
+<section class="hero">
+    <div class="wrap hero-inner">
+        <div class="hero-text">
+            <span class="eyebrow">Піца · суші · бургери · десерти</span>
+            <h1>Смачна їжа<br>за <em>60 хвилин</em></h1>
+            <p class="hero-sub">Готуємо після вашого замовлення на кухні в центрі {{ site.city_gen }}.
+               Привозимо гарячим або чекаємо на самовивіз — без доплат за «швидкість».</p>
+            <div class="hero-actions">
+                <a class="btn btn-accent" href="#menu">До меню</a>
+                <a class="btn btn-ghost" href="#delivery">Доставка й оплата</a>
+            </div>
+            <dl class="hero-stats">
+                <div><dt>40–60 хв</dt><dd>доставка по місту</dd></div>
+                <div><dt>{{ min_order|money }}</dt><dd>мінімальне замовлення</dd></div>
+                <div><dt>{{ free_shipping_from|money }}</dt><dd>і доставка безкоштовна</dd></div>
+            </dl>
+        </div>
+        <div class="hero-visual">
+            <div class="hero-blob"></div>
+            {% with p=hero %}
+            {% if p %}
+                <a class="hero-card" href="{{ p.get_absolute_url }}">
+                    <img src="{{ p.image.url }}" alt="{{ p.name }}">
+                    <div class="hero-card-info">
+                        <span>{{ p.category.name }}{% if p.weight %} · {{ p.weight }}{% endif %}</span>
+                        <strong>{{ p.name }}</strong>
+                        <span class="hero-card-price">{{ p.price|money }}</span>
+                    </div>
+                </a>
+            {% endif %}
+            {% if hero.discount_percent %}
+            <div class="hero-chip hero-chip-top">−{{ hero.discount_percent }}%</div>
+            {% endif %}
+            <div class="hero-chip hero-chip-bottom">Готуємо зараз</div>
+            {% endwith %}
+        </div>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="section-head">
+        <h2>Що хочеться?</h2>
+        <a class="link-more" href="#menu">Все меню →</a>
+    </div>
+    <div class="cat-grid">
+        {% for cat in categories %}
+        <a class="cat-tile" href="?category={{ cat.slug }}#menu">
+            {% with photo=cat.products.first %}
+                {% if photo.image %}
+                    <img class="cat-thumb" src="{{ photo.image.url }}" alt="{{ cat.name }}" loading="lazy">
+                {% else %}
+                    <span class="cat-emoji">{{ cat.emoji }}</span>
+                {% endif %}
+            {% endwith %}
+            <span class="cat-name">{{ cat.name }}</span>
+            <span class="cat-count">{{ cat.products.count }} поз.</span>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+{% if featured %}
+<section class="wrap section">
+    <div class="section-head">
+        <h2>Хіти меню</h2>
+    </div>
+    <div class="product-grid product-grid-3">
+        {% for product in featured %}{% include 'store/_card.html' %}{% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endif %}
+
+<section class="wrap section" id="menu">
+    <div class="section-head">
+        <h2>{% if query %}Результати: «{{ query }}»{% elif selected_category %}Меню{% else %}Меню{% endif %}</h2>
+        <span class="section-count">{{ total_found }} страв</span>
+    </div>
+
+    <div class="catalog-layout">
+        <aside class="filters">
+            <form method="get" action="{% url 'store:index' %}" id="filter-form">
+                {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+
+                <div class="filter-group">
+                    <h3>Категорії</h3>
+                    <ul class="filter-list">
+                        <li>
+                            <a class="chip {% if not selected_category %}is-active{% endif %}"
+                               href="?{% if query %}q={{ query }}&{% endif %}#menu">Усе меню</a>
+                        </li>
+                        {% for cat in categories %}
+                        <li>
+                            <a class="chip {% if selected_category == cat.slug %}is-active{% endif %}"
+                               href="?category={{ cat.slug }}{% if query %}&q={{ query }}{% endif %}#menu">
+                                {{ cat.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="filter-group">
+                    <h3>Ціна, ₴</h3>
+                    <div class="price-range">
+                        <input type="number" name="min" value="{{ price_min }}" placeholder="від" min="0">
+                        <span>—</span>
+                        <input type="number" name="max" value="{{ price_max }}" placeholder="до" min="0">
+                    </div>
+                    {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+                    <button class="btn btn-dark btn-block" type="submit">Застосувати</button>
+                </div>
+
+                <div class="filter-help">
+                    <strong>Не знаєте, що взяти?</strong>
+                    <p>Зателефонуйте — підкажемо сет або комбо під компанію.</p>
+                    <a class="link-more" href="tel:{{ site.phone_link }}">{{ site.phone }} →</a>
+                </div>
+            </form>
+        </aside>
+
+        <div class="catalog-main">
+            <div class="catalog-toolbar">
+                <span class="toolbar-info">Показано {{ products|length }} з {{ total_found }}</span>
+                <form method="get" class="sort-form">
+                    {% for key, value in request.GET.items %}
+                        {% if key != 'sort' and key != 'page' %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}
+                    {% endfor %}
+                    <label for="sort">Сортувати:</label>
+                    <select id="sort" name="sort" onchange="this.form.submit()">
+                        {% for key, opt in sort_options.items %}
+                            <option value="{{ key }}" {% if sort == key %}selected{% endif %}>{{ opt.0 }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+            </div>
+
+            {% if products %}
+            <div class="product-grid">
+                {% for product in products %}{% include 'store/_card.html' %}{% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>Нічого не знайшли</h3>
+                <p>Спробуйте інший запит або скиньте фільтри.</p>
+                <a class="btn btn-accent" href="{% url 'store:index' %}">Скинути фільтри</a>
+            </div>
+            {% endif %}
+
+            {% if page.paginator.num_pages > 1 %}
+            <nav class="pager">
+                {% if page.has_previous %}
+                    <a class="pager-link" href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page.previous_page_number }}#menu">← Назад</a>
+                {% else %}<span class="pager-link is-disabled">← Назад</span>{% endif %}
+
+                <span class="pager-status">Сторінка {{ page.number }} з {{ page.paginator.num_pages }}</span>
+
+                {% if page.has_next %}
+                    <a class="pager-link" href="?{{ querystring }}{% if querystring %}&{% endif %}page={{ page.next_page_number }}#menu">Далі →</a>
+                {% else %}<span class="pager-link is-disabled">Далі →</span>{% endif %}
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

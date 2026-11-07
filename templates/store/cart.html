@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load shop_tags %}
+{% block title %}Кошик — СМАК{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <h1 class="page-h1">Кошик</h1>
+
+    {% if cart.count %}
+    <div class="cart-layout">
+        <div class="cart-list">
+            {% for item in cart.items %}
+            <div class="cart-row">
+                <a class="cart-thumb" href="{{ item.product.get_absolute_url }}">
+                    {% if item.product.image %}<img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">{% endif %}
+                </a>
+                <div class="cart-main">
+                    <span class="card-cat">{{ item.product.category.name }}</span>
+                    <a class="cart-name" href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                    <span class="cart-unit">{{ item.price|money }}{% if item.product.weight %} · {{ item.product.weight }}{% endif %}</span>
+                </div>
+
+                <form class="cart-qty" method="post" action="{% url 'store:cart_set' item.product.id %}">
+                    {% csrf_token %}
+                    <button class="qty-btn" type="submit" name="qty" value="{{ item.qty|add:'-1' }}" aria-label="Менше">−</button>
+                    <span class="qty-value">{{ item.qty }}</span>
+                    <button class="qty-btn" type="submit" name="qty" value="{{ item.qty|add:'1' }}" aria-label="Більше">+</button>
+                </form>
+
+                <div class="cart-line-total">{{ item.line_total|money }}</div>
+
+                <form method="post" action="{% url 'store:cart_remove' item.product.id %}">
+                    {% csrf_token %}
+                    <button class="cart-remove" type="submit" title="Видалити" aria-label="Видалити">
+                        <svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+
+        <aside class="summary">
+            <h2>Разом</h2>
+            <div class="summary-row"><span>Страви ({{ cart.count }})</span><strong>{{ cart.subtotal|money }}</strong></div>
+            <div class="summary-row">
+                <span>Доставка</span>
+                <strong>{% if cart.shipping %}{{ cart.shipping|money }}{% else %}Безкоштовно{% endif %}</strong>
+            </div>
+            {% if cart.free_shipping_left %}
+            <div class="ship-hint">Ще {{ cart.free_shipping_left|money }} — і доставка безкоштовна</div>
+            {% endif %}
+            <div class="summary-total"><span>До оплати</span><strong>{{ cart.total|money }}</strong></div>
+
+            {% if cart.left_to_min_order %}
+                <div class="min-order-hint">
+                    Мінімальне замовлення — {{ min_order|money }}.
+                    Додайте ще {{ cart.left_to_min_order|money }}, щоб оформити.
+                </div>
+                <span class="btn btn-accent btn-lg btn-block is-disabled">Оформити замовлення</span>
+            {% else %}
+                <a class="btn btn-accent btn-lg btn-block" href="{% url 'store:checkout' %}">Оформити замовлення</a>
+            {% endif %}
+            <a class="link-more center" href="{% url 'store:index' %}#menu">← Продовжити вибір</a>
+        </aside>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>Кошик порожній</h3>
+        <p>Зазирніть у меню — піца, суші й десерти вже чекають.</p>
+        <a class="btn btn-accent" href="{% url 'store:index' %}#menu">До меню</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

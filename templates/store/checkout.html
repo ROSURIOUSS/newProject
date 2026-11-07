@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load shop_tags %}
+{% block title %}Оформлення замовлення — СМАК{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <h1 class="page-h1">Оформлення замовлення</h1>
+
+    <div class="checkout-layout">
+        <form class="checkout-form" method="post" novalidate>
+            {% csrf_token %}
+
+            <fieldset class="fieldset">
+                <legend>1. Контакти</legend>
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="{{ form.name.id_for_label }}">Імʼя*</label>
+                        {{ form.name }}
+                        {% for error in form.name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                    </div>
+                    <div class="field">
+                        <label for="{{ form.phone.id_for_label }}">Телефон*</label>
+                        {{ form.phone }}
+                        {% for error in form.phone.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="fieldset">
+                <legend>2. Як отримаєте</legend>
+                <div class="radio-grid">
+                    {% for radio in form.delivery %}
+                    <label class="radio-card">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+                    {% endfor %}
+                </div>
+                <div class="field">
+                    <label for="{{ form.address.id_for_label }}">Адреса доставки</label>
+                    {{ form.address }}
+                    {% for error in form.address.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                    <span class="field-hint">Вулиця, будинок, квартира, підʼїзд. Для самовивозу залиште порожнім.</span>
+                </div>
+            </fieldset>
+
+            <fieldset class="fieldset">
+                <legend>3. Коли привезти</legend>
+                <div class="radio-grid">
+                    {% for radio in form.time_slot %}
+                    <label class="radio-card">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+
+            <fieldset class="fieldset">
+                <legend>4. Оплата</legend>
+                <div class="radio-grid">
+                    {% for radio in form.payment %}
+                    <label class="radio-card">{{ radio.tag }}<span>{{ radio.choice_label }}</span></label>
+                    {% endfor %}
+                </div>
+                <div class="form-grid">
+                    <div class="field field-full">
+                        <label for="{{ form.comment.id_for_label }}">Коментар до замовлення</label>
+                        {{ form.comment }}
+                    </div>
+                    <div class="field field-full">
+                        <label for="{{ form.email.id_for_label }}">Email (необовʼязково)</label>
+                        {{ form.email }}
+                        {% for error in form.email.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+                    </div>
+                </div>
+            </fieldset>
+
+            <button class="btn btn-accent btn-lg btn-block" type="submit">Підтвердити замовлення</button>
+            <p class="form-note">Курʼєр подзвонить перед виїздом. Час доставки залежить від навантаження кухні.</p>
+        </form>
+
+        <aside class="summary">
+            <h2>Ваше замовлення</h2>
+            {% for item in cart.items %}
+            <div class="summary-item">
+                <span class="summary-item-name">{{ item.product.name }} × {{ item.qty }}</span>
+                <strong>{{ item.line_total|money }}</strong>
+            </div>
+            {% endfor %}
+            <div class="summary-row"><span>Страви</span><strong>{{ cart.subtotal|money }}</strong></div>
+            <div class="summary-row"><span>Доставка</span><strong>{% if cart.shipping %}{{ cart.shipping|money }}{% else %}Безкоштовно{% endif %}</strong></div>
+            <div class="summary-total"><span>До оплати</span><strong>{{ cart.total|money }}</strong></div>
+            <a class="link-more" href="{% url 'store:cart' %}">← Змінити кошик</a>
+        </aside>
+    </div>
+</div>
+{% endblock %}

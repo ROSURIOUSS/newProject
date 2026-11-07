@@ -1,0 +1,41 @@
+{% load shop_tags %}
+<article class="card">
+    <a class="card-media" href="{{ product.get_absolute_url }}">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+        {% else %}
+            <span class="card-media-empty">Немає фото</span>
+        {% endif %}
+        <span class="card-tags">
+            {% if product.discount_percent %}<span class="badge badge-sale">−{{ product.discount_percent }}%</span>{% endif %}
+            {% if product.is_featured and not product.discount_percent %}<span class="badge">Хіт</span>{% endif %}
+            {% if product.stock == 0 %}<span class="badge badge-muted">Немає</span>{% endif %}
+        </span>
+    </a>
+
+    <div class="card-body">
+        <span class="card-cat">{{ product.category.name }}{% if product.weight %} · {{ product.weight }}{% endif %}</span>
+        <h3 class="card-title"><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></h3>
+        {% if product.short %}<p class="card-short">{{ product.short }}</p>{% endif %}
+
+        <div class="card-foot">
+            <div class="price-block">
+                <span class="price">{{ product.price|money }}</span>
+                {% if product.old_price %}<s class="price-old">{{ product.old_price|money }}</s>{% endif %}
+            </div>
+            {% if product.stock > 0 %}
+            <form method="post" action="{% url 'store:cart_add' product.id %}">
+                {% csrf_token %}
+                <input type="hidden" name="next_url" value="{{ request.get_full_path }}">
+                <button class="btn-round" type="submit" title="Додати в кошик" aria-label="Додати в кошик">
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+                </button>
+            </form>
+            {% else %}
+            <span class="btn-round is-disabled" title="Немає в наявності">
+                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            </span>
+            {% endif %}
+        </div>
+    </div>
+</article>

@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load shop_tags %}
+{% block title %}Доставка й оплата — {{ site.name }}, {{ site.city }}{% endblock %}
+{% block meta_description %}Доставка по {{ site.city_dat }}: 40–60 хв, безкоштовно від {{ free_shipping_from|money }}, мінімальне замовлення {{ min_order|money }}. Оплата готівкою, карткою курʼєру або онлайн.{% endblock %}
+
+{% block content %}
+<section class="page-head">
+    <div class="wrap page-head-inner">
+        <span class="eyebrow">Доставка й оплата</span>
+        <h1>Привозимо гарячим за 40–60 хвилин</h1>
+        <p class="lead">Доставляємо власними курʼєрами по {{ site.city_dat }}. Замовлення від
+           {{ free_shipping_from|money }} веземо безкоштовно, менше — {{ shipping_cost|money }}
+           за адресою. Самовивіз із кухні — без доплат.</p>
+        <div class="stats-row">
+            <div class="stat"><strong>40–60 хв</strong><span>по місту</span></div>
+            <div class="stat"><strong>{{ free_shipping_from|money }}</strong><span>і доставка безкоштовна</span></div>
+            <div class="stat"><strong>{{ shipping_cost|money }}</strong><span>доставка до цієї суми</span></div>
+            <div class="stat"><strong>{{ min_order|money }}</strong><span>мінімальне замовлення</span></div>
+        </div>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="section-head"><h2>Райони й час</h2></div>
+    <div class="table-card">
+        <table class="zone-table">
+            <thead>
+                <tr><th>Район</th><th>Час</th><th>Вартість</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Центр, Наукова, Сумська</td><td>30–45 хв</td><td>{{ shipping_cost|money }}</td></tr>
+                <tr><td>Салтівка, Олексіївка</td><td>40–55 хв</td><td>{{ shipping_cost|money }}</td></tr>
+                <tr><td>Холодна гора, Павлове Поле</td><td>45–60 хв</td><td>{{ shipping_cost|money }}</td></tr>
+                <tr><td>Основʼянський, Нові Будинки</td><td>50–60 хв</td><td>{{ shipping_cost|money }}</td></tr>
+                <tr><td>Передмістя (Пʼятихатки, Рогань)</td><td>за домовленістю</td><td>від 100 ₴</td></tr>
+            </tbody>
+        </table>
+        <p class="table-note">Від {{ free_shipping_from|money }} доставка по місту безкоштовна
+           незалежно від району. У години пік (19:00–21:00) час може збільшитися на 10–15 хвилин —
+           попереджаємо про це в «Моїх замовленнях».</p>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="section-head"><h2>Оплата</h2></div>
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>Готівкою курʼєру</h3>
+            <p>Найпростіший варіант: платите при отриманні. Курʼєр має здачу з 1000 ₴.</p>
+        </div>
+        <div class="info-card">
+            <h3>Карткою курʼєру</h3>
+            <p>Термінал у кожного курʼєра, оплата карткою Visa або Mastercard при отриманні.</p>
+        </div>
+        <div class="info-card">
+            <h3>Онлайн</h3>
+            <p>Обираєте «Онлайн-оплата» в оформленні — рахунок надходить у робочому часі.
+               Замовлення стартує на кухні після підтвердження платежу.</p>
+        </div>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="section-head"><h2>Як зробити замовлення</h2></div>
+    <div class="step-grid">
+        <div class="step-card">
+            <span class="step-num">01</span>
+            <h3>Виберіть страви</h3>
+            <p>Додайте в кошик усе, що хочете. Кількість обмежена тим, скільки порцій зараз
+               є на кухні.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-num">02</span>
+            <h3>Увійдіть</h3>
+            <p>Оформлення доступне після входу — так замовлення привʼязане до вас, а історія
+               зберігається в «Моїх замовленнях».</p>
+        </div>
+        <div class="step-card">
+            <span class="step-num">03</span>
+            <h3>Заповніть адресу</h3>
+            <p>Телефон, адреса або самовивіз, час і спосіб оплати. Коментар — за бажанням.</p>
+        </div>
+        <div class="step-card">
+            <span class="step-num">04</span>
+            <h3>Отримайте</h3>
+            <p>Курʼєр зателефонує при виїзді. Статус замовлення видно на сторінці замовлення.</p>
+        </div>
+    </div>
+</section>
+
+<section class="wrap section">
+    <div class="section-head"><h2>Часті питання</h2></div>
+    <div class="faq">
+        <details open>
+            <summary>Чи можна змінити замовлення після оформлення?</summary>
+            <p>До моменту, поки замовлення в статусі «Нове» — зателефонуйте нам на
+               <a href="tel:{{ site.phone_link }}">{{ site.phone }}</a>. Якщо кухня вже почала
+               готувати, змінити склад на жаль не вийде.</p>
+        </details>
+        <details>
+            <summary>Що робити, якщо страву не можна їсти через алергію?</summary>
+            <p>У картці кожної страви є склад. Якщо алергія на горіхи, глютен, лактозу або рибу —
+               напишіть у коментарі до замовлення, і ми або замінимо складник, або підкажемо,
+               що краще вибрати.</p>
+        </details>
+        <details>
+            <summary>Чи є безкоштовна доставка?</summary>
+            <p>Так, від {{ free_shipping_from|money }} по всьому місту. Самовивіз з
+               {{ site.address }} — без доплат завжди.</p>
+        </details>
+        <details>
+            <summary>Замовлення спізнюється — що робити?</summary>
+            <p>Зателефонуйте нам: ми бачимо, де курʼєр, і скажемо реальний час. Якщо запізнення
+               з нашої вини більше 30 хвилин — наступна доставка за наш рахунок.</p>
+        </details>
+        <details>
+            <summary>Чи можна замовити на компанію?</summary>
+            <p>Так, сетами й по кілька піц. Для замовлень від 3000 ₴ діє знижка — зателефонуйте
+               або напишіть на {{ site.email }}, підберемо сет і порахуємо.</p>
+        </details>
+    </div>
+</section>
+
+<section class="wrap">
+    <div class="cta-strip">
+        <div>
+            <h2>Готові замовити?</h2>
+            <p>Меню, кошик і доставка — усе на одній сторінці.</p>
+        </div>
+        <a class="btn btn-accent btn-lg" href="{% url 'store:index' %}#menu">До меню</a>
+    </div>
+</section>
+{% endblock %}
