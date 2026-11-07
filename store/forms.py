@@ -1,0 +1,41 @@
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.models import User
+
+from .models import Order
+
+class CheckoutForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ('name', 'phone', 'delivery', 'address', 'time_slot', 'payment', 'email', 'comment')
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': 'Олена', 'autocomplete': 'name'}),
+            'phone': forms.TextInput(attrs={'placeholder': '+380 __ ___ __ __', 'autocomplete': 'tel'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'you@example.com', 'autocomplete': 'email'}),
+            'address': forms.TextInput(attrs={'placeholder': 'вул. Сумська 24, кв. 7, підʼїзд 2'}),
+            'comment': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Без цибулі, подзвоніть за 10 хв'}),
+            'delivery': forms.RadioSelect(),
+            'time_slot': forms.RadioSelect(),
+            'payment': forms.RadioSelect(),
+        }
+        labels = {
+            'address': 'Адреса доставки',
+            'time_slot': 'Коли привезти',
+            'payment': 'Спосіб оплати',
+            'delivery': 'Як отримаєте',
+        }
+
+    def clean_phone(self):
+        phone = self.cleaned_data['phone'].strip()
+        digits = ''.join(ch for ch in phone if ch.isdigit())
+        if len(digits) < 10:
+            raise forms.ValidationError('Вкажіть коректний номер телефону')
+        return phone
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get('delivery') == Order.DELIVERY_DELIVERY:
+            address = (cleaned.get('address') or '').strip()
+            if len(address) < 6:
+                self.add_error('address', 'Вкажіть вулицю, будинок і квартиру')
+        return cleaned
