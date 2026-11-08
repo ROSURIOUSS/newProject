@@ -39,3 +39,46 @@ class CheckoutForm(forms.ModelForm):
             if len(address) < 6:
                 self.add_error('address', 'Вкажіть вулицю, будинок і квартиру')
         return cleaned
+
+class SignUpForm(UserCreationForm):
+    """Реєстрація: логін, email, імʼя + пароль двічі."""
+    email = forms.EmailField(label='Email', required=True)
+    first_name = forms.CharField(label="Імʼя", max_length=60, required=False)
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = ('username', 'email', 'first_name')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Логін'
+        self.fields['username'].help_text = 'Латиниця, цифри та @/./+/-/_'
+        self.fields['password1'].label = 'Пароль'
+        self.fields['password2'].label = 'Пароль ще раз'
+        self.fields['password1'].help_text = 'Мінімум 8 символів, не лише цифри'
+        self.fields['password2'].help_text = ''
+        self.fields['username'].widget.attrs['placeholder'] = 'ваш_логін'
+        self.fields['email'].widget.attrs['placeholder'] = 'you@example.com'
+        self.fields['first_name'].widget.attrs['placeholder'] = 'Олена'
+
+    def clean_email(self):
+        email = self.cleaned_data['email'].strip().lower()
+        if User.objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError('Користувач із таким email вже є')
+        return email
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.first_name = self.cleaned_data['first_name']
+        if commit:
+            user.save()
+        return user
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = 'Логін'
+        self.fields['password'].label = 'Пароль'
+        self.fields['username'].widget.attrs['placeholder'] = 'ваш_логін'
+        self.fields['password'].widget.attrs['placeholder'] = '••••••••'

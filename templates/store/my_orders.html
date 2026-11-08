@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load shop_tags %}
+{% block title %}Мої замовлення — СМАК{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <h1 class="page-h1">Мої замовлення</h1>
+
+    {% if orders %}
+    <div class="orders-list">
+        {% for order in orders %}
+        <article class="order-card">
+            <header class="order-head">
+                <div>
+                    <strong>{{ order.number }}</strong>
+                    <span class="order-date">{{ order.created_at|date:"d.m.Y H:i" }}</span>
+                </div>
+                <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+            </header>
+            <ul class="order-items">
+                {% for item in order.items.all %}
+                <li><span>{{ item.name }} × {{ item.qty }}</span><span>{{ item.line_total|money }}</span></li>
+                {% endfor %}
+            </ul>
+            <footer class="order-foot">
+                <span>{{ order.get_delivery_display }}{% if order.address %} · {{ order.address }}{% endif %}</span>
+                <strong>{{ order.total|money }}</strong>
+            </footer>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>Замовлень поки немає</h3>
+        <p>Коли оформите перше — воно зʼявиться тут зі статусом і сумою.</p>
+        <a class="btn btn-accent" href="{% url 'store:index' %}#menu">До меню</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

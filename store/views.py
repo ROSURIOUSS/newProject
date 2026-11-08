@@ -1,14 +1,17 @@
 from decimal import Decimal, InvalidOperation
 
+from django.contrib import messages
+from django.contrib.auth import login as auth_login
+from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from .cart import Cart
-from .forms import CheckoutForm
+from .forms import CheckoutForm, SignUpForm
 from .models import Category, Order, OrderItem, Product
 
 SORT_OPTIONS = {
@@ -115,6 +118,30 @@ def cart_remove(request, product_id):
     Cart(request).remove(product_id)
     return redirect('store:cart')
 
+def register(request):
+    """Реєстрація нового клієнта + автовхід."""
+    if request.user.is_authenticated:
+        return redirect('store:index')
+
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            auth_login(request, user)
+            messages.success(request, f'Вітаємо, {user.first_name or user.username}! Акаунт створено.')
+            return redirect(request.GET.get('next') or 'store:index')
+    else:
+        form = SignUpForm()
+
+    return render(request, 'store/register.html', {'form': form})
+
+@login_required
+def my_orders(request):
+    """Історія замовлень поточного користувача."""
+    orders = request.user.orders.prefetch_related('items')
+    return render(request, 'store/my_orders.html', {'orders': orders})
+
+@login_required
 def checkout(request):
     cart = Cart(request)
     items = cart.items()
@@ -140,12 +167,21 @@ def checkout(request):
                 for item in items
             ])
             cart.clear()
+            messages.success(request, f'Замовлення {order.number} прийнято в роботу.')
             return redirect('store:order_success', order_id=order.pk)
     else:
-        form = CheckoutForm()
+        last = request.user.orders.order_by('-created_at').first()
+        form = CheckoutForm(initial={
+            'name': request.user.first_name or request.user.username,
+            'email': request.user.email,
+            'phone': last.phone if last else '',
+            'address': last.address if last else '',
+        })
 
     return render(request, 'store/checkout.html', {'form': form, 'cart': cart})
 
 def order_success(request, order_id):
     order = get_object_or_404(Order, pk=order_id)
+    if order.user_id != request.user.pk and not request.user.is_staff:
+        raise Http404('Замовлення не знайдено')
     return render(request, 'store/success.html', {'order': order})

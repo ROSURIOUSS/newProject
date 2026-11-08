@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Вхід — СМАК{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="auth-card">
+        <h1>Вхід</h1>
+        <p class="auth-sub">Увійдіть, щоб оформлювати замовлення швидше й бачити свою історію.</p>
+
+        <form method="post" class="auth-form" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="auth-error">{{ form.non_field_errors.0 }}</div>
+            {% endif %}
+            <div class="field">
+                <label for="{{ form.username.id_for_label }}">Логін</label>
+                {{ form.username }}
+            </div>
+            <div class="field">
+                <label for="{{ form.password.id_for_label }}">Пароль</label>
+                {{ form.password }}
+            </div>
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            <button class="btn btn-accent btn-lg btn-block" type="submit">Увійти</button>
+        </form>
+
+        <p class="auth-switch">Немає акаунта? <a href="{% url 'store:register' %}">Зареєструватись</a></p>
+    </div>
+</div>
+{% endblock %}
