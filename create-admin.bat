@@ -1,6 +1,8 @@
 @echo off
-title СМАК - создание администратора
+title SMAK - create admin
 cd /d "%~dp0"
+
+if exist ".venv" if not exist ".venv\Scripts\python.exe" rmdir /s /q .venv
 
 call :find_python
 if not defined PYCMD goto no_python
@@ -11,54 +13,43 @@ echo.
 
 if not exist "manage.py" goto no_project
 
-if not exist ".venv\Scripts\python.exe" (
-    echo [1/3] Готовлю окружение...
-    %PYCMD% -m venv .venv
-    if not exist ".venv\Scripts\python.exe" goto venv_fail
-    ".venv\Scripts\python.exe" -m pip install --upgrade pip
-    if exist "requirements.txt" (
-        ".venv\Scripts\python.exe" -m pip install -r requirements.txt
-    ) else (
-        ".venv\Scripts\python.exe" -m pip install "Django>=5.0,<7.0"
-    )
-    if errorlevel 1 goto pip_fail
-) else (
-    echo [1/3] Окружение на месте.
-)
+call :ensure_venv
+if errorlevel 1 goto venv_fail
 
-echo [2/3] Проверяю базу...
+call :ensure_deps
+if errorlevel 1 goto pip_fail
+
+echo [3/3] Checking database...
 ".venv\Scripts\python.exe" manage.py migrate --noinput
 if errorlevel 1 goto db_fail
 
 set "EXISTING="
 for /f "delims=" %%u in ('".venv\Scripts\python.exe" manage.py shell -v 0 -c "from django.contrib.auth import get_user_model as g;print(' '.join(u.get_username() for u in g().objects.filter(is_superuser=True)))" 2^>nul') do set "EXISTING=%%u"
 
-echo [3/3] Администратор.
 echo.
-
 if not defined EXISTING goto new_admin
 
-echo   Уже есть администратор: %EXISTING%
+echo   Administrator already exists: %EXISTING%
 echo.
-echo   [1] Задать новый пароль
-echo   [2] Создать еще одного
-echo   [0] Ничего не делать
-choice /c 120 /n /m "  Мой выбор: "
+echo   [1] Set a new password
+echo   [2] Create one more
+echo   [0] Do nothing
+choice /c 120 /n /m "  Your choice: "
 if errorlevel 3 goto finish
 if errorlevel 2 goto new_admin
 
-set /p "ADMIN_NAME=  Введите имя администратора: "
+set /p "ADMIN_NAME=  Enter the admin name: "
 if not defined ADMIN_NAME goto finish
 ".venv\Scripts\python.exe" manage.py changepassword %ADMIN_NAME%
 goto finish
 
 :new_admin
-echo   Придумайте имя, почту и пароль. Пароль при вводе не отображается.
+echo   Enter name, email and password. The password is not shown while typing.
 echo.
 ".venv\Scripts\python.exe" manage.py createsuperuser
 if errorlevel 1 goto finish
 echo.
-echo   Готово. Вход: http://127.0.0.1:8000/admin/
+echo   Done. Open http://127.0.0.1:8000/admin/ to log in.
 goto finish
 
 :finish
@@ -66,82 +57,143 @@ echo.
 pause
 exit /b 0
 
+:ensure_venv
+if exist ".venv\Scripts\python.exe" (
+    ".venv\Scripts\python.exe" -c "import sys" >nul 2>&1
+    if not errorlevel 1 (
+        echo [1/3] Environment is ready.
+        exit /b 0
+    )
+    echo [1/3] Environment is broken, creating a new one...
+    rmdir /s /q .venv
+) else (
+    echo [1/3] Creating environment...
+)
+call :find_base
+if not defined BASECMD (
+    echo Python for creating the environment was not found.
+    exit /b 1
+)
+%BASECMD% -m venv .venv
+if not exist ".venv\Scripts\python.exe" exit /b 1
+".venv\Scripts\python.exe" -m pip install --disable-pip-version-check --upgrade pip >nul 2>&1
+exit /b 0
+
+:ensure_deps
+set "REQKEY=none"
+if exist "requirements.txt" for %%A in ("requirements.txt") do set "REQKEY=%%~zA_%%~tA"
+set "MARKED="
+if exist ".venv\.smak-deps" set /p MARKED=<".venv\.smak-deps"
+
+".venv\Scripts\python.exe" -c "import django,sys;v=tuple(int(x) for x in django.__version__.split('.')[:2]);sys.exit(0 if (5,0)<=v<(7,0) else 1)" >nul 2>&1
+if errorlevel 1 goto deps_install
+if /i not "%MARKED%"=="%REQKEY%" goto deps_install
+for /f "delims=" %%v in ('".venv\Scripts\python.exe" -c "import django;print(django.__version__)"') do set "DJVER=%%v"
+echo [2/3] Dependencies are ready: Django %DJVER%
+exit /b 0
+
+:deps_install
+echo [2/3] Checking dependencies and installing the missing ones...
+".venv\Scripts\python.exe" -m pip install --disable-pip-version-check -r requirements.txt
+if errorlevel 1 exit /b 1
+".venv\Scripts\python.exe" -c "import django" >nul 2>&1
+if errorlevel 1 exit /b 1
+> ".venv\.smak-deps" echo %REQKEY%
+for /f "delims=" %%v in ('".venv\Scripts\python.exe" -c "import django;print(django.__version__)"') do set "DJVER=%%v"
+echo     Django %DJVER is installed
+exit /b 0
+
 :no_project
-echo Рядом с этим файлом должен лежать manage.py.
-echo Распакуйте проект так, чтобы create-admin.bat лежал в папке с manage.py.
+echo manage.py was not found next to this file.
+echo The project folder must contain manage.py and create-admin.bat together.
 echo.
 pause
 exit /b 1
 
 :db_fail
 echo.
-echo База не подготовилась. Ниже - что именно не так.
+echo Database could not be prepared. See the message above.
 echo.
 pause
 exit /b 1
+
 :venv_fail
 echo.
-echo Не удалось создать окружение .venv.
-echo Проверьте, что Python установлен с python.org и доступен на запись.
+echo Could not create the .venv environment.
+echo Python is installed but cannot write to this folder.
+echo Try to copy the project to another folder, for example C:\projects
 echo.
 pause
 exit /b 1
 
 :pip_fail
 echo.
-echo Зависимости не установились. Проверьте интернет и повторите запуск.
+echo Packages were not installed. Check the internet connection
+echo and run this file again.
 echo.
 pause
 exit /b 1
 
+:try_py
+if defined PYCMD2 exit /b 0
+if exist %1 (
+    %1 -c "import sys" >nul 2>&1
+    if not errorlevel 1 set "PYCMD2=%1"
+)
+exit /b 0
+
+:try_reg
+if defined PYCMD2 exit /b 0
+for /f "tokens=2,*" %%A in ('reg query "HKCU\Software\Python\PythonCore" /s /v ExecutablePath 2^>nul ^| findstr /i "ExecutablePath"') do call :try_py "%%B"
+if defined PYCMD2 exit /b 0
+for /f "tokens=2,*" %%A in ('reg query "HKLM\Software\Python\PythonCore" /s /v ExecutablePath 2^>nul ^| findstr /i "ExecutablePath"') do call :try_py "%%B"
+exit /b 0
+
+:find_base
+set "PYCMD2="
+py -3 -c "import sys" >nul 2>&1
+if not errorlevel 1 (
+    set "PYCMD2=py -3"
+    goto :fb_done
+)
+python -c "import sys" >nul 2>&1
+if not errorlevel 1 (
+    set "PYCMD2=python"
+    goto :fb_done
+)
+python3 -c "import sys" >nul 2>&1
+if not errorlevel 1 (
+    set "PYCMD2=python3"
+    goto :fb_done
+)
+for /d %%D in ("%LOCALAPPDATA%\Programs\Python\Python3*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+for /d %%D in ("%ProgramFiles%\Python3*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+for /d %%D in ("%ProgramFiles(x86)%\Python3*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+for /d %%D in ("C:\Python3*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+call :try_reg
+:fb_done
+set "BASECMD=%PYCMD2%"
+exit /b 0
+
 :find_python
 set "PYCMD="
-set "PYSHOW="
 set "PYVER="
 set "PYNUM=999"
 
-py -3 -c "import sys" >nul 2>&1
-if not errorlevel 1 (
-    set "PYCMD=py -3"
-    set "PYSHOW=py -3"
-    goto :fp_ok
-)
-
-python -c "import sys" >nul 2>&1
-if not errorlevel 1 (
-    set "PYCMD=python"
-    set "PYSHOW=python"
-    goto :fp_ok
-)
-
-python3 -c "import sys" >nul 2>&1
-if not errorlevel 1 (
-    set "PYCMD=python3"
-    set "PYSHOW=python3"
-    goto :fp_ok
-)
-
-for /d %%D in ("%LOCALAPPDATA%\Programs\Python\Python3*") do (
-    if exist "%%D\python.exe" (
-        "%%D\python.exe" -c "import sys" >nul 2>&1
-        if not errorlevel 1 (
-            set "PYCMD="%%D\python.exe""
-            set "PYSHOW=%%D\python.exe"
-            goto :fp_ok
-        )
+if exist ".venv\Scripts\python.exe" (
+    ".venv\Scripts\python.exe" -c "import sys" >nul 2>&1
+    if not errorlevel 1 (
+        set "PYCMD=".venv\Scripts\python.exe""
+        goto :fp_ok
     )
 )
-for /d %%D in ("C:\Python3*") do (
-    if exist "%%D\python.exe" (
-        "%%D\python.exe" -c "import sys" >nul 2>&1
-        if not errorlevel 1 (
-            set "PYCMD="%%D\python.exe""
-            set "PYSHOW=%%D\python.exe"
-            goto :fp_ok
-        )
-    )
-)
-exit /b 0
+call :find_base
+if defined BASECMD set "PYCMD=%BASECMD%"
+if not defined PYCMD exit /b 0
 
 :fp_ok
 for /f "delims=" %%v in ('%PYCMD% -c "import sys;print(sys.version.split()[0])"') do set "PYVER=%%v"
@@ -150,26 +202,28 @@ exit /b 0
 
 :old_python
 echo.
-echo Найден Python %PYVER%, но нужен 3.10 или новее.
-echo Поставьте свежий с https://python.org/downloads
+echo Found Python %PYVER%, but version 3.10 or newer is required.
+echo Install a fresh one from https://python.org/downloads
 echo.
 pause
 exit /b 1
 
 :no_python
 echo.
-echo Python не найден или не запускается.
+echo Python was not found on this computer.
 echo.
-echo Что видит система:
+echo What the system sees:
 where py 2>nul
 where python 2>nul
 where python3 2>nul
 echo.
-echo Если выше есть путь ...\WindowsApps\python.exe - это заглушка
-echo Microsoft Store, она не работает. Батник ее пропускает и ищет дальше.
+echo A path with WindowsApps inside means a Microsoft Store stub.
+echo That stub does not work, it is skipped on purpose.
 echo.
-echo Поставьте Python с https://python.org/downloads
-echo и при установке отметьте галочку "Add python.exe to PATH".
+echo Install Python from https://python.org/downloads
+echo and tick the box "Add python.exe to PATH" during setup.
+echo If Python is already installed, run it once from the Start menu,
+echo then use the option "Add Python to PATH" in its installer.
 echo.
 pause
 exit /b 1

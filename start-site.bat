@@ -1,116 +1,167 @@
 @echo off
-title СМАК - локальный сайт
+title SMAK - local site
 cd /d "%~dp0"
+
+if exist ".venv" if not exist ".venv\Scripts\python.exe" rmdir /s /q .venv
 
 call :find_python
 if not defined PYCMD goto no_python
 if %PYNUM% LSS 310 goto old_python
 
-echo   Python: %PYVER%   [%PYSHOW%]
+echo   Python: %PYVER%
 echo.
 
-if exist ".venv" if not exist ".venv\Scripts\python.exe" rmdir /s /q .venv
+call :ensure_venv
+if errorlevel 1 goto venv_fail
 
-if not exist ".venv\Scripts\python.exe" (
-    echo [1/3] Первый запуск: создаю окружение и ставлю зависимости...
-    %PYCMD% -m venv .venv
-    if not exist ".venv\Scripts\python.exe" goto venv_fail
-    ".venv\Scripts\python.exe" -m pip install --upgrade pip
-    if exist "requirements.txt" (
-        ".venv\Scripts\python.exe" -m pip install -r requirements.txt
-    ) else (
-        ".venv\Scripts\python.exe" -m pip install "Django>=5.0,<7.0"
-    )
-    if errorlevel 1 goto pip_fail
-) else (
-    echo [1/3] Окружение на месте.
-)
+call :ensure_deps
+if errorlevel 1 goto pip_fail
 
 if not exist "db.sqlite3" (
-    echo [2/3] Готовлю базу и меню...
+    echo [3/4] Preparing database and menu...
     ".venv\Scripts\python.exe" manage.py migrate
     ".venv\Scripts\python.exe" manage.py load_menu
 ) else (
-    echo [2/3] База и меню на месте.
+    echo [3/4] Database and menu are ready.
 )
 
-echo [3/3] Запускаю сервер...
+echo [4/4] Starting server...
 echo.
-echo   Сайт:      http://127.0.0.1:8000/
-echo   Админка:   http://127.0.0.1:8000/admin/
-echo   Вход в админку: сначала запустите create-admin.bat
-echo   Остановка: Ctrl+C или закрыть это окно
+echo   Site:     http://127.0.0.1:8000/
+echo   Admin:    http://127.0.0.1:8000/admin/
+echo   To log in to admin run create-admin.bat first
+echo   Stop:     Ctrl+C or close this window
 echo.
 start "" /b cmd /c "timeout /t 3 >nul & start http://127.0.0.1:8000/"
 ".venv\Scripts\python.exe" manage.py runserver
 echo.
-echo Сервер остановлен.
+echo Server stopped.
 pause
+exit /b 0
+
+:ensure_venv
+if exist ".venv\Scripts\python.exe" (
+    ".venv\Scripts\python.exe" -c "import sys" >nul 2>&1
+    if not errorlevel 1 (
+        echo [1/4] Environment is ready.
+        exit /b 0
+    )
+    echo [1/4] Environment is broken, creating a new one...
+    rmdir /s /q .venv
+) else (
+    echo [1/4] Creating environment...
+)
+call :find_base
+if not defined BASECMD (
+    echo Python for creating the environment was not found.
+    exit /b 1
+)
+%BASECMD% -m venv .venv
+if not exist ".venv\Scripts\python.exe" exit /b 1
+".venv\Scripts\python.exe" -m pip install --disable-pip-version-check --upgrade pip >nul 2>&1
+exit /b 0
+
+:ensure_deps
+set "REQKEY=none"
+if exist "requirements.txt" for %%A in ("requirements.txt") do set "REQKEY=%%~zA_%%~tA"
+set "MARKED="
+if exist ".venv\.smak-deps" set /p MARKED=<".venv\.smak-deps"
+
+".venv\Scripts\python.exe" -c "import django,sys;v=tuple(int(x) for x in django.__version__.split('.')[:2]);sys.exit(0 if (5,0)<=v<(7,0) else 1)" >nul 2>&1
+if errorlevel 1 goto deps_install
+if /i not "%MARKED%"=="%REQKEY%" goto deps_install
+for /f "delims=" %%v in ('".venv\Scripts\python.exe" -c "import django;print(django.__version__)"') do set "DJVER=%%v"
+echo [2/4] Dependencies are ready: Django %DJVER%
+exit /b 0
+
+:deps_install
+echo [2/4] Checking dependencies and installing the missing ones...
+".venv\Scripts\python.exe" -m pip install --disable-pip-version-check -r requirements.txt
+if errorlevel 1 exit /b 1
+".venv\Scripts\python.exe" -c "import django" >nul 2>&1
+if errorlevel 1 exit /b 1
+> ".venv\.smak-deps" echo %REQKEY%
+for /f "delims=" %%v in ('".venv\Scripts\python.exe" -c "import django;print(django.__version__)"') do set "DJVER=%%v"
+echo     Django %DJVER is installed
 exit /b 0
 
 :venv_fail
 echo.
-echo Не удалось создать окружение .venv.
-echo Проверьте, что Python установлен с python.org и доступен на запись.
+echo Could not create the .venv environment.
+echo Python is installed but cannot write to this folder.
+echo Try to copy the project to another folder, for example C:\projects
 echo.
 pause
 exit /b 1
 
 :pip_fail
 echo.
-echo Зависимости не установились. Проверьте интернет и повторите запуск.
+echo Packages were not installed. Check the internet connection
+echo and run this file again.
 echo.
 pause
 exit /b 1
 
+:try_py
+if defined PYCMD2 exit /b 0
+if exist %1 (
+    %1 -c "import sys" >nul 2>&1
+    if not errorlevel 1 set "PYCMD2=%1"
+)
+exit /b 0
+
+:try_reg
+if defined PYCMD2 exit /b 0
+for /f "tokens=2,*" %%A in ('reg query "HKCU\Software\Python\PythonCore" /s /v ExecutablePath 2^>nul ^| findstr /i "ExecutablePath"') do call :try_py "%%B"
+if defined PYCMD2 exit /b 0
+for /f "tokens=2,*" %%A in ('reg query "HKLM\Software\Python\PythonCore" /s /v ExecutablePath 2^>nul ^| findstr /i "ExecutablePath"') do call :try_py "%%B"
+exit /b 0
+
+:find_base
+set "PYCMD2="
+py -3 -c "import sys" >nul 2>&1
+if not errorlevel 1 (
+    set "PYCMD2=py -3"
+    goto :fb_done
+)
+python -c "import sys" >nul 2>&1
+if not errorlevel 1 (
+    set "PYCMD2=python"
+    goto :fb_done
+)
+python3 -c "import sys" >nul 2>&1
+if not errorlevel 1 (
+    set "PYCMD2=python3"
+    goto :fb_done
+)
+for /d %%D in ("%LOCALAPPDATA%\Programs\Python\Python3*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+for /d %%D in ("%ProgramFiles%\Python3*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+for /d %%D in ("%ProgramFiles(x86)%\Python3*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+for /d %%D in ("C:\Python3*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+call :try_reg
+:fb_done
+set "BASECMD=%PYCMD2%"
+exit /b 0
+
 :find_python
 set "PYCMD="
-set "PYSHOW="
 set "PYVER="
 set "PYNUM=999"
 
-py -3 -c "import sys" >nul 2>&1
-if not errorlevel 1 (
-    set "PYCMD=py -3"
-    set "PYSHOW=py -3"
-    goto :fp_ok
-)
-
-python -c "import sys" >nul 2>&1
-if not errorlevel 1 (
-    set "PYCMD=python"
-    set "PYSHOW=python"
-    goto :fp_ok
-)
-
-python3 -c "import sys" >nul 2>&1
-if not errorlevel 1 (
-    set "PYCMD=python3"
-    set "PYSHOW=python3"
-    goto :fp_ok
-)
-
-for /d %%D in ("%LOCALAPPDATA%\Programs\Python\Python3*") do (
-    if exist "%%D\python.exe" (
-        "%%D\python.exe" -c "import sys" >nul 2>&1
-        if not errorlevel 1 (
-            set "PYCMD="%%D\python.exe""
-            set "PYSHOW=%%D\python.exe"
-            goto :fp_ok
-        )
+if exist ".venv\Scripts\python.exe" (
+    ".venv\Scripts\python.exe" -c "import sys" >nul 2>&1
+    if not errorlevel 1 (
+        set "PYCMD=".venv\Scripts\python.exe""
+        goto :fp_ok
     )
 )
-for /d %%D in ("C:\Python3*") do (
-    if exist "%%D\python.exe" (
-        "%%D\python.exe" -c "import sys" >nul 2>&1
-        if not errorlevel 1 (
-            set "PYCMD="%%D\python.exe""
-            set "PYSHOW=%%D\python.exe"
-            goto :fp_ok
-        )
-    )
-)
-exit /b 0
+call :find_base
+if defined BASECMD set "PYCMD=%BASECMD%"
+if not defined PYCMD exit /b 0
 
 :fp_ok
 for /f "delims=" %%v in ('%PYCMD% -c "import sys;print(sys.version.split()[0])"') do set "PYVER=%%v"
@@ -119,26 +170,28 @@ exit /b 0
 
 :old_python
 echo.
-echo Найден Python %PYVER%, но нужен 3.10 или новее.
-echo Поставьте свежий с https://python.org/downloads
+echo Found Python %PYVER%, but version 3.10 or newer is required.
+echo Install a fresh one from https://python.org/downloads
 echo.
 pause
 exit /b 1
 
 :no_python
 echo.
-echo Python не найден или не запускается.
+echo Python was not found on this computer.
 echo.
-echo Что видит система:
+echo What the system sees:
 where py 2>nul
 where python 2>nul
 where python3 2>nul
 echo.
-echo Если выше есть путь ...\WindowsApps\python.exe - это заглушка
-echo Microsoft Store, она не работает. Батник ее пропускает и ищет дальше.
+echo A path with WindowsApps inside means a Microsoft Store stub.
+echo That stub does not work, it is skipped on purpose.
 echo.
-echo Поставьте Python с https://python.org/downloads
-echo и при установке отметьте галочку "Add python.exe to PATH".
+echo Install Python from https://python.org/downloads
+echo and tick the box "Add python.exe to PATH" during setup.
+echo If Python is already installed, run it once from the Start menu,
+echo then use the option "Add Python to PATH" in its installer.
 echo.
 pause
 exit /b 1
