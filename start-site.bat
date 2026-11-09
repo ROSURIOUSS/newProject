@@ -1,6 +1,5 @@
 @echo off
-chcp 65001 >nul
-title ╨б╨Ь╨Р╨Ъ тАФ ╨╗╨╛╨║╨░╨╗╤М╨╜╤Л╨╣ ╤Б╨░╨╣╤В
+title СМАК - локальный сайт
 cd /d "%~dp0"
 
 call :find_python
@@ -13,7 +12,7 @@ echo.
 if exist ".venv" if not exist ".venv\Scripts\python.exe" rmdir /s /q .venv
 
 if not exist ".venv\Scripts\python.exe" (
-    echo [1/3] ╨Я╨╡╤А╨▓╤Л╨╣ ╨╖╨░╨┐╤Г╤Б╨║: ╤Б╨╛╨╖╨┤╨░╤О ╨╛╨║╤А╤Г╨╢╨╡╨╜╨╕╨╡ ╨╕ ╤Б╤В╨░╨▓╨╗╤О ╨╖╨░╨▓╨╕╤Б╨╕╨╝╨╛╤Б╤В╨╕...
+    echo [1/3] Первый запуск: создаю окружение и ставлю зависимости...
     %PYCMD% -m venv .venv
     if not exist ".venv\Scripts\python.exe" goto venv_fail
     ".venv\Scripts\python.exe" -m pip install --upgrade pip
@@ -24,45 +23,42 @@ if not exist ".venv\Scripts\python.exe" (
     )
     if errorlevel 1 goto pip_fail
 ) else (
-    echo [1/3] ╨Ю╨║╤А╤Г╨╢╨╡╨╜╨╕╨╡ ╨╜╨░ ╨╝╨╡╤Б╤В╨╡.
+    echo [1/3] Окружение на месте.
 )
 
 if not exist "db.sqlite3" (
-    echo [2/3] ╨У╨╛╤В╨╛╨▓╨╗╤О ╨▒╨░╨╖╤Г ╨╕ ╨╝╨╡╨╜╤О...
+    echo [2/3] Готовлю базу и меню...
     ".venv\Scripts\python.exe" manage.py migrate
     ".venv\Scripts\python.exe" manage.py load_menu
 ) else (
-    echo [2/3] ╨С╨░╨╖╨░ ╨╕ ╨╝╨╡╨╜╤О ╨╜╨░ ╨╝╨╡╤Б╤В╨╡.
+    echo [2/3] База и меню на месте.
 )
 
-echo [3/3] ╨Ч╨░╨┐╤Г╤Б╨║╨░╤О ╤Б╨╡╤А╨▓╨╡╤А...
+echo [3/3] Запускаю сервер...
 echo.
-echo   ╨б╨░╨╣╤В:      http://127.0.0.1:8000/
-echo   ╨Р╨┤╨╝╨╕╨╜╨║╨░:   http://127.0.0.1:8000/admin/
-echo   ╨Т╤Е╨╛╨┤ ╨▓ ╨░╨┤╨╝╨╕╨╜╨║╤Г: ╤Б╨╜╨░╤З╨░╨╗╨░ ╨╖╨░╨┐╤Г╤Б╤В╨╕╤В╨╡ create-admin.bat
-echo   ╨Ю╤Б╤В╨░╨╜╨╛╨▓╨║╨░: Ctrl+C ╨╕╨╗╨╕ ╨╖╨░╨║╤А╤Л╤В╤М ╤Н╤В╨╛ ╨╛╨║╨╜╨╛
+echo   Сайт:      http://127.0.0.1:8000/
+echo   Админка:   http://127.0.0.1:8000/admin/
+echo   Вход в админку: сначала запустите create-admin.bat
+echo   Остановка: Ctrl+C или закрыть это окно
 echo.
 start "" /b cmd /c "timeout /t 3 >nul & start http://127.0.0.1:8000/"
 ".venv\Scripts\python.exe" manage.py runserver
 echo.
-echo ╨б╨╡╤А╨▓╨╡╤А ╨╛╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜.
+echo Сервер остановлен.
 pause
 exit /b 0
 
 :venv_fail
 echo.
-echo ╨Э╨╡ ╤Г╨┤╨░╨╗╨╛╤Б╤М ╤Б╨╛╨╖╨┤╨░╤В╤М ╨╛╨║╤А╤Г╨╢╨╡╨╜╨╕╨╡ .venv.
-echo ╨Я╨╛╨┐╤А╨╛╨▒╤Г╨╣╤В╨╡ ╨▓╤А╤Г╤З╨╜╤Г╤О ╨▓ ╤Н╤В╨╛╨╝ ╨╛╨║╨╜╨╡:
-echo    %PYCMD% -m venv .venv
-echo    .venv\Scripts\python.exe -m pip install "Django>=5.0,<7.0"
+echo Не удалось создать окружение .venv.
+echo Проверьте, что Python установлен с python.org и доступен на запись.
 echo.
 pause
 exit /b 1
 
 :pip_fail
 echo.
-echo ╨Ч╨░╨▓╨╕╤Б╨╕╨╝╨╛╤Б╤В╨╕ ╨╜╨╡ ╤Г╤Б╤В╨░╨╜╨╛╨▓╨╕╨╗╨╕╤Б╤М. ╨Я╤А╨╛╨▓╨╡╤А╤М╤В╨╡ ╨╕╨╜╤В╨╡╤А╨╜╨╡╤В ╨╕ ╨╖╨░╨┐╤Г╤Б╤В╨╕╤В╨╡:
-echo    .venv\Scripts\python.exe -m pip install "Django>=5.0,<7.0"
+echo Зависимости не установились. Проверьте интернет и повторите запуск.
 echo.
 pause
 exit /b 1
@@ -123,28 +119,26 @@ exit /b 0
 
 :old_python
 echo.
-echo ╨Э╨░╨╣╨┤╨╡╨╜ Python %PYVER%, ╨╜╨╛ ╨╜╤Г╨╢╨╡╨╜ 3.10 ╨╕╨╗╨╕ ╨╜╨╛╨▓╨╡╨╡.
-echo ╨Я╨╛╤Б╤В╨░╨▓╤М╤В╨╡ ╤Б╨▓╨╡╨╢╨╕╨╣ ╤Б https://python.org/downloads
-echo (╤Б╤В╨░╤А╤Г╤О ╨▓╨╡╤А╤Б╨╕╤О ╨╝╨╛╨╢╨╜╨╛ ╨╜╨╡ ╤Г╨┤╨░╨╗╤П╤В╤М).
+echo Найден Python %PYVER%, но нужен 3.10 или новее.
+echo Поставьте свежий с https://python.org/downloads
 echo.
 pause
 exit /b 1
 
 :no_python
 echo.
-echo Python ╨╜╨╡ ╨╜╨░╨╣╨┤╨╡╨╜ ╨╕╨╗╨╕ ╨╜╨╡ ╨╖╨░╨┐╤Г╤Б╨║╨░╨╡╤В╤Б╤П.
+echo Python не найден или не запускается.
 echo.
-echo ╨з╤В╨╛ ╨▓╨╕╨┤╨╕╤В ╤Б╨╕╤Б╤В╨╡╨╝╨░:
+echo Что видит система:
 where py 2>nul
 where python 2>nul
 where python3 2>nul
 echo.
-echo ╨Х╤Б╨╗╨╕ ╨▓╤Л╤И╨╡ ╨╡╤Б╤В╤М ╨┐╤Г╤В╤М ...\WindowsApps\python.exe тАФ ╤Н╤В╨╛ ╨╖╨░╨│╨╗╤Г╤И╨║╨░
-echo Microsoft Store, ╨╛╨╜╨░ ╨╜╨╡ ╤А╨░╨▒╨╛╤В╨░╨╡╤В. ╨Ю╨╜╨░ ╤З╨░╤Б╤В╨╛ ╤Б╤В╨╛╨╕╤В ╨▓ PATH ╤А╨░╨╜╤М╤И╨╡
-echo ╨╜╨░╤Б╤В╨╛╤П╤Й╨╡╨│╨╛ Python, ╨┐╨╛╤Н╤В╨╛╨╝╤Г ╨▒╨░╤В╨╜╨╕╨║ ╨╡╤С ╨┐╤А╨╛╨┐╤Г╤Б╨║╨░╨╡╤В ╨╕ ╨╕╤Й╨╡╤В ╨┤╨░╨╗╤М╤И╨╡.
+echo Если выше есть путь ...\WindowsApps\python.exe - это заглушка
+echo Microsoft Store, она не работает. Батник ее пропускает и ищет дальше.
 echo.
-echo ╨Я╨╛╤Б╤В╨░╨▓╤М╤В╨╡ Python ╤Б https://python.org/downloads
-echo ╨╕ ╨┐╤А╨╕ ╤Г╤Б╤В╨░╨╜╨╛╨▓╨║╨╡ ╨╛╤В╨╝╨╡╤В╤М╤В╨╡ ╨│╨░╨╗╨╛╤З╨║╤Г "Add python.exe to PATH".
+echo Поставьте Python с https://python.org/downloads
+echo и при установке отметьте галочку "Add python.exe to PATH".
 echo.
 pause
 exit /b 1

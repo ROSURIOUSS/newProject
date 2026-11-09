@@ -1,6 +1,5 @@
 @echo off
-chcp 65001 >nul
-title ╨б╨Ь╨Р╨Ъ тАФ ╤Б╨╛╨╖╨┤╨░╨╜╨╕╨╡ ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А╨░
+title СМАК - создание администратора
 cd /d "%~dp0"
 
 call :find_python
@@ -13,7 +12,7 @@ echo.
 if not exist "manage.py" goto no_project
 
 if not exist ".venv\Scripts\python.exe" (
-    echo [1/3] ╨У╨╛╤В╨╛╨▓╨╗╤О ╨╛╨║╤А╤Г╨╢╨╡╨╜╨╕╨╡...
+    echo [1/3] Готовлю окружение...
     %PYCMD% -m venv .venv
     if not exist ".venv\Scripts\python.exe" goto venv_fail
     ".venv\Scripts\python.exe" -m pip install --upgrade pip
@@ -24,42 +23,42 @@ if not exist ".venv\Scripts\python.exe" (
     )
     if errorlevel 1 goto pip_fail
 ) else (
-    echo [1/3] ╨Ю╨║╤А╤Г╨╢╨╡╨╜╨╕╨╡ ╨╜╨░ ╨╝╨╡╤Б╤В╨╡.
+    echo [1/3] Окружение на месте.
 )
 
-echo [2/3] ╨Я╤А╨╛╨▓╨╡╤А╤П╤О ╨▒╨░╨╖╤Г...
+echo [2/3] Проверяю базу...
 ".venv\Scripts\python.exe" manage.py migrate --noinput
 if errorlevel 1 goto db_fail
 
 set "EXISTING="
 for /f "delims=" %%u in ('".venv\Scripts\python.exe" manage.py shell -v 0 -c "from django.contrib.auth import get_user_model as g;print(' '.join(u.get_username() for u in g().objects.filter(is_superuser=True)))" 2^>nul') do set "EXISTING=%%u"
 
-echo [3/3] ╨Р╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А.
+echo [3/3] Администратор.
 echo.
 
 if not defined EXISTING goto new_admin
 
-echo   ╨г╨╢╨╡ ╨╡╤Б╤В╤М ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А: %EXISTING%
+echo   Уже есть администратор: %EXISTING%
 echo.
-echo   [1] ╨Ч╨░╨┤╨░╤В╤М ╨╜╨╛╨▓╤Л╨╣ ╨┐╨░╤А╨╛╨╗╤М
-echo   [2] ╨б╨╛╨╖╨┤╨░╤В╤М ╨╡╤Й╤С ╨╛╨┤╨╜╨╛╨│╨╛
-echo   [0] ╨Э╨╕╤З╨╡╨│╨╛ ╨╜╨╡ ╨┤╨╡╨╗╨░╤В╤М
-choice /c 120 /n /m "  ╨Ь╨╛╨╣ ╨▓╤Л╨▒╨╛╤А: "
+echo   [1] Задать новый пароль
+echo   [2] Создать еще одного
+echo   [0] Ничего не делать
+choice /c 120 /n /m "  Мой выбор: "
 if errorlevel 3 goto finish
 if errorlevel 2 goto new_admin
 
-set /p "ADMIN_NAME=  ╨Т╨▓╨╡╨┤╨╕╤В╨╡ ╨╕╨╝╤П ╨░╨┤╨╝╨╕╨╜╨╕╤Б╤В╤А╨░╤В╨╛╤А╨░: "
+set /p "ADMIN_NAME=  Введите имя администратора: "
 if not defined ADMIN_NAME goto finish
 ".venv\Scripts\python.exe" manage.py changepassword %ADMIN_NAME%
 goto finish
 
 :new_admin
-echo   ╨Я╤А╨╕╨┤╤Г╨╝╨░╨╣╤В╨╡ ╨╕╨╝╤П, ╨┐╨╛╤З╤В╤Г ╨╕ ╨┐╨░╤А╨╛╨╗╤М. ╨Я╨░╤А╨╛╨╗╤М ╨┐╤А╨╕ ╨▓╨▓╨╛╨┤╨╡ ╨╜╨╡ ╨╛╤В╨╛╨▒╤А╨░╨╢╨░╨╡╤В╤Б╤П.
+echo   Придумайте имя, почту и пароль. Пароль при вводе не отображается.
 echo.
 ".venv\Scripts\python.exe" manage.py createsuperuser
 if errorlevel 1 goto finish
 echo.
-echo   ╨У╨╛╤В╨╛╨▓╨╛. ╨Т╤Е╨╛╨┤: http://127.0.0.1:8000/admin/
+echo   Готово. Вход: http://127.0.0.1:8000/admin/
 goto finish
 
 :finish
@@ -68,59 +67,66 @@ pause
 exit /b 0
 
 :no_project
-echo ╨а╤П╨┤╨╛╨╝ ╤Б ╤Н╤В╨╕╨╝ ╤Д╨░╨╣╨╗╨╛╨╝ ╨┤╨╛╨╗╨╢╨╡╨╜ ╨╗╨╡╨╢╨░╤В╤М manage.py.
-echo ╨а╨░╤Б╨┐╨░╨║╤Г╨╣╤В╨╡ ╨┐╤А╨╛╨╡╨║╤В ╤В╨░╨║, ╤З╤В╨╛╨▒╤Л create-admin.bat ╨╗╨╡╨╢╨░╨╗ ╨▓ ╨┐╨░╨┐╨║╨╡ ╤Б manage.py.
-echo.
-pause
-exit /b 1
-
-:venv_fail
-echo.
-echo ╨Э╨╡ ╤Г╨┤╨░╨╗╨╛╤Б╤М ╤Б╨╛╨╖╨┤╨░╤В╤М ╨╛╨║╤А╤Г╨╢╨╡╨╜╨╕╨╡ .venv.
-echo ╨Я╤А╨╛╨▓╨╡╤А╤М╤В╨╡, ╤З╤В╨╛ Python ╤Г╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜ ╤Б python.org ╨╕ ╨┤╨╛╤Б╤В╤Г╨┐╨╡╨╜ ╨╜╨░ ╨╖╨░╨┐╨╕╤Б╤М.
-echo.
-pause
-exit /b 1
-
-:pip_fail
-echo.
-echo ╨Ч╨░╨▓╨╕╤Б╨╕╨╝╨╛╤Б╤В╨╕ ╨╜╨╡ ╤Г╤Б╤В╨░╨╜╨╛╨▓╨╕╨╗╨╕╤Б╤М. ╨Я╤А╨╛╨▓╨╡╤А╤М╤В╨╡ ╨╕╨╜╤В╨╡╤А╨╜╨╡╤В ╨╕ ╨┐╨╛╨▓╤В╨╛╤А╨╕╤В╨╡ ╨╖╨░╨┐╤Г╤Б╨║.
+echo Рядом с этим файлом должен лежать manage.py.
+echo Распакуйте проект так, чтобы create-admin.bat лежал в папке с manage.py.
 echo.
 pause
 exit /b 1
 
 :db_fail
 echo.
-echo ╨С╨░╨╖╨░ ╨╜╨╡ ╨┐╨╛╨┤╨│╨╛╤В╨╛╨▓╨╕╨╗╨░╤Б╤М. ╨Э╨╕╨╢╨╡ тАФ ╤З╤В╨╛ ╨╕╨╝╨╡╨╜╨╜╨╛ ╨╜╨╡ ╤В╨░╨║.
+echo База не подготовилась. Ниже - что именно не так.
+echo.
+pause
+exit /b 1
+:venv_fail
+echo.
+echo Не удалось создать окружение .venv.
+echo Проверьте, что Python установлен с python.org и доступен на запись.
+echo.
+pause
+exit /b 1
+
+:pip_fail
+echo.
+echo Зависимости не установились. Проверьте интернет и повторите запуск.
 echo.
 pause
 exit /b 1
 
 :find_python
 set "PYCMD="
+set "PYSHOW="
 set "PYVER="
 set "PYNUM=999"
 
 py -3 -c "import sys" >nul 2>&1
 if not errorlevel 1 (
     set "PYCMD=py -3"
+    set "PYSHOW=py -3"
     goto :fp_ok
 )
+
 python -c "import sys" >nul 2>&1
 if not errorlevel 1 (
     set "PYCMD=python"
+    set "PYSHOW=python"
     goto :fp_ok
 )
+
 python3 -c "import sys" >nul 2>&1
 if not errorlevel 1 (
     set "PYCMD=python3"
+    set "PYSHOW=python3"
     goto :fp_ok
 )
+
 for /d %%D in ("%LOCALAPPDATA%\Programs\Python\Python3*") do (
     if exist "%%D\python.exe" (
         "%%D\python.exe" -c "import sys" >nul 2>&1
         if not errorlevel 1 (
             set "PYCMD="%%D\python.exe""
+            set "PYSHOW=%%D\python.exe"
             goto :fp_ok
         )
     )
@@ -130,6 +136,7 @@ for /d %%D in ("C:\Python3*") do (
         "%%D\python.exe" -c "import sys" >nul 2>&1
         if not errorlevel 1 (
             set "PYCMD="%%D\python.exe""
+            set "PYSHOW=%%D\python.exe"
             goto :fp_ok
         )
     )
@@ -143,17 +150,26 @@ exit /b 0
 
 :old_python
 echo.
-echo ╨Э╨░╨╣╨┤╨╡╨╜ Python %PYVER%, ╨╜╨╛ ╨╜╤Г╨╢╨╡╨╜ 3.10 ╨╕╨╗╨╕ ╨╜╨╛╨▓╨╡╨╡.
-echo ╨Я╨╛╤Б╤В╨░╨▓╤М╤В╨╡ ╤Б╨▓╨╡╨╢╨╕╨╣ ╤Б https://python.org/downloads
+echo Найден Python %PYVER%, но нужен 3.10 или новее.
+echo Поставьте свежий с https://python.org/downloads
 echo.
 pause
 exit /b 1
 
 :no_python
 echo.
-echo Python ╨╜╨╡ ╨╜╨░╨╣╨┤╨╡╨╜ ╨╕╨╗╨╕ ╨╜╨╡ ╨╖╨░╨┐╤Г╤Б╨║╨░╨╡╤В╤Б╤П.
-echo ╨Я╨╛╤Б╤В╨░╨▓╤М╤В╨╡ ╨╡╨│╨╛ ╤Б https://python.org/downloads
-echo ╨╕ ╨┐╤А╨╕ ╤Г╤Б╤В╨░╨╜╨╛╨▓╨║╨╡ ╨╛╤В╨╝╨╡╤В╤М╤В╨╡ ╨│╨░╨╗╨╛╤З╨║╤Г "Add python.exe to PATH".
+echo Python не найден или не запускается.
+echo.
+echo Что видит система:
+where py 2>nul
+where python 2>nul
+where python3 2>nul
+echo.
+echo Если выше есть путь ...\WindowsApps\python.exe - это заглушка
+echo Microsoft Store, она не работает. Батник ее пропускает и ищет дальше.
+echo.
+echo Поставьте Python с https://python.org/downloads
+echo и при установке отметьте галочку "Add python.exe to PATH".
 echo.
 pause
 exit /b 1
