@@ -18,6 +18,9 @@
                     <span class="card-cat">{{ item.product.category.name }}</span>
                     <a class="cart-name" href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
                     <span class="cart-unit">{{ item.price|money }}{% if item.product.weight %} · {{ item.product.weight }}{% endif %}</span>
+                    {% if item.qty >= item.max_qty %}
+                        <span class="cart-limit">Максимум {{ item.max_qty }} порц. на кухні</span>
+                    {% endif %}
                 </div>
 
                 <form class="cart-qty" method="post" action="{% url 'store:cart_set' item.product.id %}">

@@ -4,7 +4,8 @@ from django.contrib import messages
 from django.contrib.auth import login as auth_login
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db import transaction
+from django.db.models import F, Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -159,7 +160,8 @@ def cart_add(request, product_id):
         qty = int(request.POST.get('qty', 1))
     except ValueError:
         qty = 1
-    cart.add(product, max(1, min(qty, 99)))
+    if not cart.add(product, max(1, min(qty, 99))):
+        messages.error(request, f'«{product.name}» сьогодні закінчилось — додати не вдалось.')
     if request.POST.get('next') == 'cart':
         return redirect('store:cart')
     return HttpResponseRedirect(request.POST.get('next_url') or reverse('store:cart'))
@@ -207,24 +209,44 @@ def checkout(request):
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
-            order = form.save(commit=False)
-            order.user = request.user
-            order.total = cart.total
-            order.save()
+            with transaction.atomic():
+                locked = {
+                    p.pk: p for p in Product.objects.select_for_update()
+                    .filter(pk__in=[item['product'].pk for item in items])
+                }
+                short = []
+                for item in items:
+                    product = locked.get(item['product'].pk)
+                    available = product.stock if product else 0
+                    if available < item['qty']:
+                        short.append(f'«{item["product"].name}» — залишилось {available} порц')
 
-            OrderItem.objects.bulk_create([
-                OrderItem(
-                    order=order,
-                    product=item['product'],
-                    name=item['product'].name,
-                    price=item['price'],
-                    qty=item['qty'],
-                )
-                for item in items
-            ])
-            cart.clear()
-            messages.success(request, f'Замовлення {order.number} прийнято в роботу.')
-            return redirect('store:order_success', order_id=order.pk)
+                if short:
+                    form.add_error(None, 'Частину страв уже розібрали: ' + '; '.join(short)
+                                   + '. Зменшіть кількість у кошику.')
+                else:
+                    order = form.save(commit=False)
+                    order.user = request.user
+                    order.total = cart.total
+                    order.save()
+
+                    OrderItem.objects.bulk_create([
+                        OrderItem(
+                            order=order,
+                            product=item['product'],
+                            name=item['product'].name,
+                            price=item['price'],
+                            qty=item['qty'],
+                        )
+                        for item in items
+                    ])
+                    for item in items:
+                        Product.objects.filter(pk=item['product'].pk).update(
+                            stock=F('stock') - item['qty']
+                        )
+                    cart.clear()
+                    messages.success(request, f'Замовлення {order.number} прийнято в роботу.')
+                    return redirect('store:order_success', order_id=order.pk)
     else:
         last = request.user.orders.order_by('-created_at').first()
         form = CheckoutForm(initial={

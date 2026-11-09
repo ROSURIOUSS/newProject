@@ -11,22 +11,28 @@ class Cart:
         self.cart = self.session.get(settings.CART_SESSION_ID, {})
 
     def add(self, product, qty=1):
+        """Додає порції, але не більше, ніж є на кухні. False — якщо склад порожній."""
+        if product.stock <= 0:
+            return False
         key = str(product.pk)
         item = self.cart.get(key, {'qty': 0, 'price': str(product.price)})
-        item['qty'] = min(item['qty'] + int(qty), 99)
+        item['qty'] = min(item['qty'] + int(qty), product.stock, 99)
         item['price'] = str(product.price)
         self.cart[key] = item
         self.save()
+        return True
 
     def set_qty(self, product_id, qty):
         key = str(product_id)
         if key not in self.cart:
             return
+        product = Product.objects.filter(pk=product_id).first()
+        limit = min(product.stock, 99) if product else 99
         qty = int(qty)
-        if qty <= 0:
+        if qty <= 0 or limit <= 0:
             self.cart.pop(key)
         else:
-            self.cart[key]['qty'] = min(qty, 99)
+            self.cart[key]['qty'] = min(qty, limit)
         self.save()
 
     def remove(self, product_id):
@@ -60,6 +66,7 @@ class Cart:
             result.append({
                 'product': product,
                 'qty': qty,
+                'max_qty': product.stock,
                 'price': price,
                 'line_total': price * qty,
             })
