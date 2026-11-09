@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Редагування відгуку — {{ site.name }}{% endblock %}
+
+{% block content %}
+<div class="wrap section">
+    <nav class="breadcrumbs">
+        <a href="{% url 'store:index' %}">Меню</a> /
+        <a href="{% url 'store:product' review.product.slug %}">{{ review.product.name }}</a> /
+        <span>Відгук</span>
+    </nav>
+
+    <div class="auth-card">
+        <h1>Редагувати відгук</h1>
+        <p class="auth-sub">{{ review.product.name }}</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="form-row mb-3">
+                <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}<div class="field-error">{{ field.errors.0 }}</div>{% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-accent btn-block">Зберегти</button>
+            <a class="btn btn-ghost btn-block mt-2" href="{% url 'store:product' review.product.slug %}">Скасувати</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

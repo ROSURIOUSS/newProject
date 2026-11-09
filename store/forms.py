@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.models import User
 
-from .models import Order
+from .models import Order, Review
 
 class CheckoutForm(forms.ModelForm):
     class Meta:
@@ -82,3 +82,16 @@ class LoginForm(AuthenticationForm):
         self.fields['password'].label = 'Пароль'
         self.fields['username'].widget.attrs['placeholder'] = 'ваш_логін'
         self.fields['password'].widget.attrs['placeholder'] = '••••••••'
+
+
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ('rating', 'text')
+        widgets = {
+            'rating': forms.Select(attrs={'class': 'form-select'}),
+            'text': forms.Textarea(attrs={
+                'class': 'form-control', 'rows': 3,
+                'placeholder': 'Що сподобалось, а що можна покращити?',
+            }),
+        }

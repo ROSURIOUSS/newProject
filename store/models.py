@@ -75,6 +75,18 @@ class Product(models.Model):
             return round((self.old_price - self.price) / self.old_price * 100)
         return 0
 
+    @staticmethod
+    def rating_summary(reviews):
+        ratings = [r.rating for r in reviews]
+        if not ratings:
+            return None
+        return round(sum(ratings) / len(ratings), 1)
+
+    @property
+    def average_rating(self):
+        avg = self.reviews.aggregate(value=models.Avg('rating'))['value']
+        return round(avg, 1) if avg else None
+
     def __str__(self):
         return self.name
 
@@ -159,3 +171,39 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.name} × {self.qty}'
+
+
+class Review(models.Model):
+    """Відгук клієнта про страву. Один клієнт — один відгук на страву."""
+    RATING_CHOICES = [(i, f'{i} ★') for i in range(1, 6)]
+
+    product = models.ForeignKey(
+        Product, on_delete=models.CASCADE, related_name='reviews', verbose_name='Страва'
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviews',
+        verbose_name='Клієнт'
+    )
+    rating = models.PositiveSmallIntegerField('Оцінка', choices=RATING_CHOICES, default=5)
+    text = models.TextField('Відгук')
+    created_at = models.DateTimeField('Створено', auto_now_add=True)
+    updated_at = models.DateTimeField('Оновлено', auto_now=True)
+
+    class Meta:
+        verbose_name = 'Відгук'
+        verbose_name_plural = 'Відгуки'
+        ordering = ['-created_at']
+        constraints = [
+            models.UniqueConstraint(fields=['product', 'user'], name='one_review_per_client')
+        ]
+
+    @property
+    def stars(self):
+        return '★' * self.rating + '☆' * (5 - self.rating)
+
+    @property
+    def author(self):
+        return self.user.first_name or self.user.username
+
+    def __str__(self):
+        return f'{self.author}: {self.product.name} — {self.rating}/5'
