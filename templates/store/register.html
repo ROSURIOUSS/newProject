@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Реєстрація — СМАК{% endblock %}
+
+{% block content %}
+<div class="wrap">
+    <div class="auth-card">
+        <h1>Реєстрація</h1>
+        <p class="auth-sub">Акаунт потрібен, щоб оформлювати замовлення й бачити їхню історію.</p>
+
+        <form method="post" class="auth-form" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="auth-error">{{ form.non_field_errors.0 }}</div>
+            {% endif %}
+
+            <div class="field">
+                <label for="{{ form.username.id_for_label }}">{{ form.username.label }}*</label>
+                {{ form.username }}
+                {% for error in form.username.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+
+            <div class="field">
+                <label for="{{ form.email.id_for_label }}">{{ form.email.label }}*</label>
+                {{ form.email }}
+                {% for error in form.email.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+
+            <div class="field">
+                <label for="{{ form.first_name.id_for_label }}">{{ form.first_name.label }}</label>
+                {{ form.first_name }}
+                {% for error in form.first_name.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+
+            <div class="field">
+                <label for="{{ form.password1.id_for_label }}">{{ form.password1.label }}*</label>
+                {{ form.password1 }}
+                <span class="field-hint">{{ form.password1.help_text }}</span>
+                {% for error in form.password1.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+
+            <div class="field">
+                <label for="{{ form.password2.id_for_label }}">{{ form.password2.label }}*</label>
+                {{ form.password2 }}
+                {% for error in form.password2.errors %}<span class="field-error">{{ error }}</span>{% endfor %}
+            </div>
+
+            <button class="btn btn-accent btn-lg btn-block" type="submit">Створити акаунт</button>
+        </form>
+
+        <p class="auth-switch">Вже маєте акаунт? <a href="{% url 'store:login' %}">Увійти</a></p>
+    </div>
+</div>
+{% endblock %}

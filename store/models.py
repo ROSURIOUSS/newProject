@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
@@ -104,6 +105,10 @@ class Order(models.Model):
         ('later', 'На пізніший час'),
     ]
 
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='orders', verbose_name='Клієнт'
+    )
     name = models.CharField('Імʼя', max_length=120)
     phone = models.CharField('Телефон', max_length=30)
     email = models.EmailField('Email', blank=True)

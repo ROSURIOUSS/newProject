@@ -86,6 +86,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+LOGIN_URL = 'store:login'
+LOGIN_REDIRECT_URL = 'store:index'
+LOGOUT_REDIRECT_URL = 'store:index'
+
 SITE_NAME = 'СМАК'
 SITE_TAGLINE = 'доставка їжі'
 SITE_CITY = 'Харків'
