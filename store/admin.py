@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import Category, Order, OrderItem, Product
+from .models import Category, Order, OrderItem, Product, Review
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -60,3 +60,15 @@ class OrderAdmin(admin.ModelAdmin):
     readonly_fields = ['total', 'created_at']
     inlines = [OrderItemInline]
     date_hierarchy = 'created_at'
+
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'author', 'rating', 'created_at')
+    list_filter = ('rating', 'created_at')
+    search_fields = ('text', 'user__username', 'product__name')
+    readonly_fields = ('created_at', 'updated_at')
+
+    @admin.display(description='Клієнт')
+    def author(self, obj):
+        return obj.author

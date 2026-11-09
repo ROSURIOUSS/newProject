@@ -106,6 +106,80 @@
         {% endif %}
     </div>
 
+    <section class="section reviews-section">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
+            <h2 class="mb-0">Відгуки</h2>
+            {% if avg_rating %}
+            <span class="badge text-bg-warning fs-6">{{ avg_rating }} / 5 · {{ reviews_count }} відгук{{ reviews_count|pluralize:"ів,и" }}</span>
+            {% endif %}
+        </div>
+
+        {% if user.is_authenticated %}
+            {% if my_review %}
+            <div class="card mb-4 review-editor">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <strong>Ваш відгук</strong>
+                        <span class="text-warning">{{ my_review.stars }}</span>
+                    </div>
+                    <p class="mb-3">{{ my_review.text|linebreaksbr }}</p>
+                    <div class="d-flex gap-2">
+                        <a class="btn btn-sm btn-ghost" href="{% url 'store:review_edit' my_review.pk %}">Редагувати</a>
+                        <form method="post" action="{% url 'store:review_delete' my_review.pk %}" onsubmit="return confirm('Видалити ваш відгук?')">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-ghost-danger">Видалити</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card mb-4 review-editor">
+                <div class="card-body">
+                    <h3 class="h5 mb-3">Залишити відгук</h3>
+                    <form method="post" action="{% url 'store:review_add' product.slug %}">
+                        {% csrf_token %}
+                        <div class="row g-3 align-items-start">
+                            <div class="col-sm-3">
+                                <label class="form-label" for="{{ review_form.rating.id_for_label }}">Оцінка</label>
+                                {{ review_form.rating }}
+                            </div>
+                            <div class="col-sm-9">
+                                <label class="form-label" for="{{ review_form.text.id_for_label }}">Відгук</label>
+                                {{ review_form.text }}
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-accent mt-3">Надіслати</button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-light border mb-4">
+                <a href="{% url 'store:login' %}?next={{ request.path }}">Увійдіть</a>, щоб залишити відгук.
+            </div>
+        {% endif %}
+
+        {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div>
+                        <strong>{{ review.author }}</strong>
+                        <span class="badge text-bg-warning ms-2">{{ review.stars }}</span>
+                    </div>
+                    <small class="text-muted">{{ review.created_at|date:"d.m.Y" }}</small>
+                </div>
+                <p class="mb-0">{{ review.text|linebreaksbr }}</p>
+                {% if review.updated_at|date:"YmdHi" != review.created_at|date:"YmdHi" %}
+                <small class="text-muted">змінено {{ review.updated_at|date:"d.m.Y H:i" }}</small>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-muted">Поки що відгуків немає — будьте першим.</p>
+        {% endfor %}
+    </section>
+
     {% if related %}
     <section class="section">
         <div class="section-head"><h2>До цього часто беруть</h2></div>

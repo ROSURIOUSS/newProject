@@ -11,8 +11,8 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 from .cart import Cart
-from .forms import CheckoutForm, SignUpForm
-from .models import Category, Order, OrderItem, Product
+from .forms import CheckoutForm, ReviewForm, SignUpForm
+from .models import Category, Order, OrderItem, Product, Review
 
 SORT_OPTIONS = {
     'new': ('Новинки', '-created_at'),
@@ -90,7 +90,63 @@ def contacts(request):
 def product_detail(request, slug):
     product = get_object_or_404(Product.objects.select_related('category'), slug=slug, is_active=True)
     related = Product.objects.filter(category=product.category, is_active=True).exclude(pk=product.pk)[:3]
-    return render(request, 'store/product.html', {'product': product, 'related': related})
+    all_reviews = list(product.reviews.select_related('user'))
+    my_review = None
+    if request.user.is_authenticated:
+        my_review = next((r for r in all_reviews if r.user_id == request.user.pk), None)
+    others = [r for r in all_reviews if r is not my_review]
+    return render(request, 'store/product.html', {
+        'product': product,
+        'related': related,
+        'reviews': others,
+        'reviews_count': len(all_reviews),
+        'my_review': my_review,
+        'review_form': ReviewForm(instance=my_review),
+        'avg_rating': Product.rating_summary(all_reviews),
+    })
+
+
+@login_required
+@require_POST
+def review_add(request, slug):
+    product = get_object_or_404(Product, slug=slug, is_active=True)
+    if Review.objects.filter(product=product, user=request.user).exists():
+        messages.info(request, 'Ви вже залишили відгук про цю страву — його можна відредагувати.')
+        return redirect('store:product', slug=slug)
+    form = ReviewForm(request.POST)
+    if form.is_valid():
+        review = form.save(commit=False)
+        review.product = product
+        review.user = request.user
+        review.save()
+        messages.success(request, 'Дякуємо за відгук!')
+    else:
+        messages.error(request, 'Відгук не збережено: текст обов’язковий.')
+    return redirect('store:product', slug=slug)
+
+
+@login_required
+def review_edit(request, review_id):
+    review = get_object_or_404(Review, pk=review_id, user=request.user)
+    if request.method == 'POST':
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Відгук оновлено.')
+            return redirect('store:product', slug=review.product.slug)
+    else:
+        form = ReviewForm(instance=review)
+    return render(request, 'store/review_form.html', {'form': form, 'review': review})
+
+
+@login_required
+@require_POST
+def review_delete(request, review_id):
+    review = get_object_or_404(Review, pk=review_id, user=request.user)
+    slug = review.product.slug
+    review.delete()
+    messages.success(request, 'Відгук видалено.')
+    return redirect('store:product', slug=slug)
 
 def cart_detail(request):
     return render(request, 'store/cart.html', {'cart': Cart(request)})
