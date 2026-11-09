@@ -5,7 +5,6 @@ __pycache__/
 venv/
 env/
 
-*.bat
 *.bundle
 *.zip
 /*.py
