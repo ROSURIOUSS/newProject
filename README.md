@@ -24,31 +24,44 @@
 - SQLite
 - Bootstrap
 
-## Як запустити проєкт
+## Швидкий запуск на Windows
 
-### 1. Завантажити проєкт
+У папці з проєктом уже лежать два готові файли — вони самі створюють окруження, ставлять залежності й готують базу. Нічого вводити в терміналі не потрібно.
 
-Завантажте проєкт та відкрийте папку `food-shop` у терміналі.
+| Файл | Що робить |
+|---|---|
+| `start-site.bat` | запускає сайт на http://127.0.0.1:8000/ |
+| `create-admin.bat` | створює адміністратора або змінює йому пароль |
 
-### 2. Створити віртуальне середовище
+Порядок: спочатку `start-site.bat` (перший запуск триває довше — ставляться залежності), потім за потреби `create-admin.bat`, і далі вхід в адмінку на http://127.0.0.1:8000/admin/.
 
-```bash
-python -m venv .venv
-```
+Потрібен лише Python 3.10 або новіший з https://python.org/downloads (під час встановлення відмітьте «Add python.exe to PATH»).
 
-### 3. Активувати середовище
+## Як запустити проєкт у PyCharm
 
-Windows:
+### 1. Відкрити проєкт
 
-```bash
-.venv\Scripts\activate
-```
+PyCharm → **File → Open** → вибрати папку з проєктом, тобто папку `newProject`, у якій лежить `manage.py` (саме папку, не окремий файл) → **OK**.
 
-### 4. Встановити залежності
+Якщо PyCharm питає про довіру до проєкту — **Trust Project**.
 
-```bash
-pip install -r requirements.txt
-```
+### 2. Створити інтерпретатор
+
+**File → Settings** (на macOS: **PyCharm → Settings**) → **Project: newProject → Python Interpreter** → шестерня або **Add Interpreter → Add Local Interpreter**.
+
+Далі: **Virtualenv Environment → New** → у полі **Base interpreter** вибрати Python 3.10 або новіший → **OK**.
+
+PyCharm створить папку `.venv` усередині проєкту й сам підключить її до нього.
+
+### 3. Встановити залежності
+
+PyCharm сам покаже внизу повідомлення **Install requirements** для файлу `requirements.txt` — натиснути його.
+
+Якщо повідомлення не з'явилось: відкрити `requirements.txt`, правий клік на файлі → **Install requirements**.
+
+### 4. Відкрити термінал PyCharm
+
+**View → Tool Windows → Terminal** (або `Alt+F12`). Термінал одразу працює з тим інтерпретатором, який вибрали в кроці 2, тому всі команди нижче вводяться в ньому.
 
 ### 5. Підготувати базу даних
 
@@ -62,6 +75,8 @@ python manage.py migrate
 python manage.py load_menu
 ```
 
+У базі з'являться 7 категорій і 24 страви з фото.
+
 ### 7. Створити адміністратора
 
 ```bash
@@ -72,9 +87,13 @@ python manage.py createsuperuser
 
 ### 8. Запустити сайт
 
+Найпростіше — у тому ж терміналі:
+
 ```bash
 python manage.py runserver
 ```
+
+Або кнопкою **Run**: **Run → Edit Configurations → + → Python** → у полі **Script** вказати `manage.py`, у полі **Parameters** — `runserver`, **Working directory** — папка `newProject` → **OK** → **Run**.
 
 Після запуску відкрийте сайт у браузері:
 
@@ -83,3 +102,22 @@ http://127.0.0.1:8000/
 Адміністративна панель:
 
 http://127.0.0.1:8000/admin/
+
+### Якщо щось не працює
+
+| Проблема | Що зробити |
+|---|---|
+| `No module named django` | вибрано не той інтерпретатор: Settings → Python Interpreter → вибрати `.venv` цього проєкту |
+| `That port is already in use` | у терміналі `python manage.py runserver 8001`, тоді сайт на http://127.0.0.1:8001/ |
+| PyCharm не бачить `manage.py` | відкрийте саме папку `newProject`, а не окремий файл |
+| Сторінка пуста, немає страв | не виконано `python manage.py load_menu` |
+| Не пускає в адмінку | не створено адміністратора: `python manage.py createsuperuser` |
+
+## Що обрати: батники чи PyCharm
+
+Обидва способи запускають той самий сайт.
+
+- `start-site.bat` і `create-admin.bat` — швидко, без відкриття редактора: подвійний клік і все.
+- PyCharm — зручно, коли проєкт треба редагувати й налагоджувати: точки зупину, автодоповнення, інтерпретатор у налаштуваннях.
+
+Окруження `.venv`, яке створює батник, PyCharm теж бачить: у **Python Interpreter** його можна вибрати як наявне, і тоді встановлювати нічого не доведеться.
