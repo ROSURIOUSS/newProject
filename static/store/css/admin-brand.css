@@ -1,0 +1,230 @@
+:root,
+html[data-theme="light"] {
+    --primary: #E4572E;
+    --secondary: #2B2320;
+    --accent: #E4572E;
+    --primary-fg: #ffffff;
+
+    --body-fg: #1d1a17;
+    --body-bg: #fdfbf7;
+    --body-quiet-color: #78716a;
+    --body-medium-color: #423d36;
+    --body-loud-color: #1d1a17;
+
+    --header-color: #ffffff;
+    --header-branding-color: #ffffff;
+    --header-bg: #2B2320;
+    --header-link-color: #f6efe7;
+
+    --breadcrumbs-fg: #d9cfc4;
+    --breadcrumbs-link-fg: #ffffff;
+    --breadcrumbs-bg: #3a2f2a;
+
+    --link-fg: #c2451f;
+    --link-hover-color: #E4572E;
+    --link-selected-fg: #E4572E;
+
+    --hairline-color: #eee6da;
+    --border-color: #ddd2c2;
+
+    --error-fg: #b3261e;
+
+    --message-debug-bg: #f1ece3;
+    --message-info-bg: #e8f1f7;
+    --message-success-bg: #e9f5ec;
+    --message-warning-bg: #fdf3dc;
+    --message-error-bg: #fbe9e7;
+
+    --darkened-bg: #f6f1e8;
+    --selected-bg: #f3e7de;
+    --selected-row: #ffefe8;
+
+    --button-fg: #ffffff;
+    --button-bg: #E4572E;
+    --button-hover-bg: #c2451f;
+    --default-button-bg: #2B2320;
+    --default-button-hover-bg: #423d36;
+    --close-button-bg: #8d8378;
+    --close-button-hover-bg: #6f665c;
+    --delete-button-bg: #b3261e;
+    --delete-button-hover-bg: #8e1d17;
+
+    --object-tools-fg: #ffffff;
+    --object-tools-bg: #2B2320;
+    --object-tools-hover-bg: #423d36;
+
+    --font-family-primary: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+html[data-theme="dark"] {
+    --primary: #E4572E;
+    --secondary: #12100e;
+    --accent: #ff8a5c;
+    --primary-fg: #ffffff;
+
+    --body-fg: #f3ede4;
+    --body-bg: #191614;
+    --body-quiet-color: #a99f94;
+    --body-medium-color: #d8cfc3;
+    --body-loud-color: #ffffff;
+
+    --header-color: #ffffff;
+    --header-branding-color: #ffffff;
+    --header-bg: #12100e;
+    --header-link-color: #f3ede4;
+
+    --breadcrumbs-fg: #d8cfc3;
+    --breadcrumbs-link-fg: #ffffff;
+    --breadcrumbs-bg: #241f1b;
+
+    --link-fg: #ff8a5c;
+    --link-hover-color: #ffab88;
+    --link-selected-fg: #E4572E;
+
+    --hairline-color: #2e2823;
+    --border-color: #3d3530;
+
+    --error-fg: #ff8a80;
+
+    --message-debug-bg: #2b2621;
+    --message-info-bg: #1f3846;
+    --message-success-bg: #1d3a26;
+    --message-warning-bg: #43331a;
+    --message-error-bg: #45201d;
+
+    --darkened-bg: #211d1a;
+    --selected-bg: #2e2823;
+    --selected-row: #43301f;
+
+    --button-fg: #ffffff;
+    --button-bg: #E4572E;
+    --button-hover-bg: #c2451f;
+    --default-button-bg: #423d36;
+    --default-button-hover-bg: #5a5148;
+    --close-button-bg: #4a423b;
+    --close-button-hover-bg: #6f665c;
+    --delete-button-bg: #b3261e;
+    --delete-button-hover-bg: #d13a30;
+
+    --object-tools-fg: #ffffff;
+    --object-tools-bg: #423d36;
+    --object-tools-hover-bg: #5a5148;
+}
+
+#header {
+    background: var(--header-bg);
+    border-bottom: 3px solid var(--accent);
+}
+
+#branding #site-name a {
+    font-weight: 700;
+    letter-spacing: .2px;
+}
+
+#branding #site-name a span {
+    color: var(--accent);
+}
+
+.theme-toggle {
+    border: 1px solid rgba(255, 255, 255, .35);
+    border-radius: 50%;
+}
+
+.module h2,
+.module caption,
+.inline-group h2 {
+    background: var(--header-bg);
+    color: #ffffff;
+    border-radius: 8px 8px 0 0;
+}
+
+.module {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--hairline-color);
+}
+
+input[type="submit"],
+button,
+.button,
+a.button {
+    border-radius: 8px;
+}
+
+#changelist-filter h2 {
+    border-radius: 8px 8px 0 0;
+}
+
+#changelist-search input[type="text"] {
+    border-radius: 8px;
+}
+
+.paginator a,
+.paginator .this-page {
+    border-radius: 6px;
+}
+
+.login .form-row input {
+    border-radius: 8px;
+}
+
+#content h1 {
+    font-weight: 700;
+}
+
+#nav-global .admin-to-site {
+    color: #ffffff;
+    background: rgba(255, 255, 255, .12);
+    border: 1px solid rgba(255, 255, 255, .3);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    margin: 14px 0 0;
+}
+
+#nav-global .admin-to-site:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+}
+
+.login #container {
+    border-radius: 14px;
+    border: 1px solid var(--hairline-color);
+    overflow: hidden;
+}
+
+.login #header {
+    border-bottom: 3px solid var(--accent);
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="url"]:focus,
+textarea:focus,
+select:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+#changelist tbody tr:hover td,
+#changelist tbody tr:hover th {
+    background: var(--selected-row);
+}
+
+.login .submit-row input {
+    width: 100%;
+}
+
+.login .submit-row {
+    padding: 16px 0 0;
+}
+
+.help,
+.form-row .help {
+    color: var(--body-quiet-color);
+}
