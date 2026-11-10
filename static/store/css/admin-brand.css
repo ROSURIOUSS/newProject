@@ -228,3 +228,161 @@ select:focus {
 .form-row .help {
     color: var(--body-quiet-color);
 }
+
+.admin-thumb {
+    height: 38px;
+    width: 38px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid var(--hairline-color);
+    display: block;
+}
+
+.admin-preview {
+    max-height: 180px;
+    border-radius: 10px;
+    border: 1px solid var(--hairline-color);
+}
+
+.pill {
+    display: inline-block;
+    min-width: 26px;
+    padding: 2px 9px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.6;
+}
+
+.pill-count {
+    background: var(--accent-soft);
+    color: var(--link-fg);
+}
+
+.pill-muted {
+    background: var(--darkened-bg);
+    color: var(--body-quiet-color);
+}
+
+.pill-ok {
+    background: #e9f5ec;
+    color: #1f6b34;
+}
+
+.pill-low {
+    background: #fdf3dc;
+    color: #8a5a00;
+}
+
+.pill-out {
+    background: #fbe9e7;
+    color: #a3241c;
+}
+
+html[data-theme="dark"] .pill-ok {
+    background: #1d3a26;
+    color: #8fdca6;
+}
+
+html[data-theme="dark"] .pill-low {
+    background: #43331a;
+    color: #f0c273;
+}
+
+html[data-theme="dark"] .pill-out {
+    background: #45201d;
+    color: #ff9d94;
+}
+
+html[data-theme="dark"] .pill-count {
+    background: #3a2620;
+    color: #ff8a5c;
+}
+
+.price-now {
+    font-weight: 600;
+}
+
+.price-old {
+    color: var(--body-quiet-color);
+    font-size: 12px;
+}
+
+.order-status {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-new {
+    background: #e8f1f7;
+    color: #16506e;
+}
+
+.status-cooking {
+    background: #fdf3dc;
+    color: #8a5a00;
+}
+
+.status-delivering {
+    background: #eee9fb;
+    color: #4d3a94;
+}
+
+.status-done {
+    background: #e9f5ec;
+    color: #1f6b34;
+}
+
+.status-cancelled {
+    background: #fbe9e7;
+    color: #a3241c;
+}
+
+html[data-theme="dark"] .status-new {
+    background: #1f3846;
+    color: #9ed3ef;
+}
+
+html[data-theme="dark"] .status-cooking {
+    background: #43331a;
+    color: #f0c273;
+}
+
+html[data-theme="dark"] .status-delivering {
+    background: #2e2a45;
+    color: #b3a6f0;
+}
+
+html[data-theme="dark"] .status-done {
+    background: #1d3a26;
+    color: #8fdca6;
+}
+
+html[data-theme="dark"] .status-cancelled {
+    background: #45201d;
+    color: #ff9d94;
+}
+
+.admin-stars {
+    color: #e0a10b;
+    letter-spacing: 1px;
+}
+
+.fieldset-heading,
+.module h2 {
+    letter-spacing: .3px;
+}
+
+.submit-row {
+    border-radius: 0 0 10px 10px;
+}
+
+.submit-row input,
+.submit-row a {
+    border-radius: 8px;
+}

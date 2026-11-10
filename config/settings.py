@@ -31,6 +31,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+ADMIN_SITE_HEADER = 'СМАК'
+ADMIN_SITE_TITLE = 'СМАК · керування'
+ADMIN_INDEX_TITLE = 'Панель керування'
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

@@ -136,9 +136,9 @@ exit /b 1
 
 :try_py
 if defined PYCMD2 exit /b 0
-if exist %1 (
-    %1 -c "import sys" >nul 2>&1
-    if not errorlevel 1 set "PYCMD2=%1"
+if exist "%~1" (
+    "%~1" -c "import sys" >nul 2>&1
+    if not errorlevel 1 set PYCMD2="%~1"
 )
 exit /b 0
 
@@ -173,6 +173,12 @@ if defined PYCMD2 goto :fb_done
 for /d %%D in ("%ProgramFiles(x86)%\Python3*") do call :try_py "%%D\python.exe"
 if defined PYCMD2 goto :fb_done
 for /d %%D in ("C:\Python3*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+for /d %%D in ("%LOCALAPPDATA%\Microsoft\WindowsApps\PythonSoftwareFoundation.Python.*") do call :try_py "%%D\python.exe"
+if defined PYCMD2 goto :fb_done
+for /f "delims=" %%P in ('where python 2^>nul') do call :try_py "%%P"
+if defined PYCMD2 goto :fb_done
+for /f "delims=" %%P in ('where python3 2^>nul') do call :try_py "%%P"
 if defined PYCMD2 goto :fb_done
 call :try_reg
 :fb_done
@@ -220,10 +226,15 @@ echo.
 echo A path with WindowsApps inside means a Microsoft Store stub.
 echo That stub does not work, it is skipped on purpose.
 echo.
-echo Install Python from https://python.org/downloads
-echo and tick the box "Add python.exe to PATH" during setup.
-echo If Python is already installed, run it once from the Start menu,
-echo then use the option "Add Python to PATH" in its installer.
+echo Install Python: open https://python.org/downloads
+echo tick the box "Add python.exe to PATH" during setup, then run me again.
+echo.
+echo Or install it from the command line (one line, no clicking):
+echo     winget install -e --id Python.Python.3.12
+echo After that close this window and start again.
+echo.
+echo If Python is already installed, start it once from the Start menu
+echo and use the option "Add Python to PATH" in its installer.
 echo.
 pause
 exit /b 1
