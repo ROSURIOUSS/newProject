@@ -1,5 +1,6 @@
 from django.contrib import admin
-from django.db.models import Count
+from django.db.models import Count, Sum
+from django.utils import timezone
 from django.utils.html import format_html
 
 from .models import Category, Order, OrderItem, Product, Review
@@ -194,3 +195,70 @@ class ReviewAdmin(admin.ModelAdmin):
     def short_text(self, obj):
         text = obj.text if len(obj.text) <= 60 else obj.text[:60] + '…'
         return text
+
+
+def dashboard_context(request):
+    today = timezone.localdate()
+    orders = Order.objects.all()
+    today_sum = orders.filter(created_at__date=today).aggregate(s=Sum('total'))['s'] or 0
+    cards = [
+        {
+            'label': 'Замовлень сьогодні',
+            'value': orders.filter(created_at__date=today).count(),
+            'note': f'на суму {money(today_sum)}',
+            'url': '/admin/store/order/',
+        },
+        {
+            'label': 'Нові',
+            'value': orders.filter(status='new').count(),
+            'note': 'чекають підтвердження',
+            'url': '/admin/store/order/?status__exact=new',
+        },
+        {
+            'label': 'У роботі',
+            'value': orders.filter(status__in=['cooking', 'delivering']).count(),
+            'note': 'готуються або в дорозі',
+            'url': '/admin/store/order/?status__exact=cooking',
+        },
+        {
+            'label': 'Страв у меню',
+            'value': Product.objects.filter(is_active=True).count(),
+            'note': f'без порцій: {Product.objects.filter(is_active=True, stock=0).count()}',
+            'url': '/admin/store/product/',
+        },
+    ]
+
+    feed = []
+    for order in orders.order_by('-created_at')[:5]:
+        css, label = STATUS_STYLES.get(order.status, ('status-new', order.get_status_display()))
+        feed.append({
+            'number': order.number,
+            'name': order.name,
+            'status_class': css.replace('status-', ''),
+            'status_label': label,
+            'total': money(order.total),
+            'created': timezone.localtime(order.created_at).strftime('%d.%m %H:%M'),
+            'url': f'/admin/store/order/{order.pk}/change/',
+        })
+
+    rows = list(OrderItem.objects.values('name').annotate(qty=Count('id')).order_by('-qty')[:5])
+    top = rows[0]['qty'] if rows else 1
+    popular = [{'name': row['name'],
+                'count': row['qty'],
+                'percent': max(8, round(row['qty'] * 100 / top))} for row in rows]
+
+    return {'smak_cards': cards, 'smak_feed': feed, 'smak_popular': popular}
+
+
+_default_each_context = admin.site.each_context
+
+
+def _smak_each_context(request):
+    context = _default_each_context(request)
+    if request.path.rstrip('/').endswith('/admin'):
+        context.update(dashboard_context(request))
+    return context
+
+
+admin.site.each_context = _smak_each_context
+admin.site.index_template = 'admin/index.html'

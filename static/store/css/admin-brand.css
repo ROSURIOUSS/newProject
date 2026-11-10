@@ -386,3 +386,814 @@ html[data-theme="dark"] .status-cancelled {
 .submit-row a {
     border-radius: 8px;
 }
+
+/* === СМАК: власний скин адмінки === */
+
+body.smak-dashboard {
+    background: var(--body-bg);
+}
+
+#container {
+    background: var(--body-bg);
+}
+
+/* сайдбар */
+#nav-sidebar {
+    background: #2B2320;
+    border-right: 0;
+    padding-top: 14px;
+}
+
+#nav-sidebar .module,
+#nav-sidebar .module caption,
+#nav-sidebar .module th,
+#nav-sidebar .module td {
+    background: transparent;
+    border: 0;
+}
+
+#nav-sidebar .module caption,
+#nav-sidebar .module caption a {
+    color: #C9BDB2;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 14px 16px 6px;
+}
+
+#nav-sidebar .module a {
+    color: #F4EDE4;
+    padding: 9px 16px;
+    display: block;
+    border-radius: 8px;
+    margin: 1px 8px;
+    transition: background .15s ease, color .15s ease;
+}
+
+#nav-sidebar .module a:hover,
+#nav-sidebar .module a:focus {
+    background: rgba(228, 87, 46, .18);
+    color: #ffffff;
+}
+
+#nav-sidebar .current-model a,
+#nav-sidebar tr.current-model td a,
+#nav-sidebar .module tr.current-model {
+    background: #E4572E;
+    color: #ffffff;
+    border-radius: 8px;
+}
+
+#nav-sidebar .addlink,
+#nav-sidebar .changelink {
+    color: #E4572E;
+    font-weight: 600;
+}
+
+#nav-sidebar .addlink::before,
+#nav-sidebar .changelink::before {
+    display: none;
+}
+
+#toggle-nav-sidebar {
+    background: #2B2320;
+    color: #F4EDE4;
+    border: 0;
+}
+
+#nav-sidebar input[type="text"] {
+    margin: 10px 12px;
+    width: calc(100% - 24px);
+    background: #3A302B;
+    border: 1px solid #4A3E37;
+    color: #F4EDE4;
+    border-radius: 8px;
+    padding: 7px 10px;
+}
+
+/* контент */
+#content {
+    padding: 26px 28px 40px;
+}
+
+#content h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin: 0 0 18px;
+    color: var(--body-fg);
+}
+
+/* заголовок дашборда */
+.smak-hello {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: linear-gradient(135deg, #2B2320 0%, #3d2f28 100%);
+    color: #F7F1E8;
+    border-radius: 16px;
+    padding: 26px 28px;
+    margin-bottom: 20px;
+}
+
+.smak-hi-day {
+    margin: 0 0 6px;
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: #E4572E;
+    font-weight: 700;
+}
+
+.smak-hello h1 {
+    color: #ffffff;
+    margin: 0 0 6px;
+    font-size: 27px;
+}
+
+.smak-hi-sub {
+    margin: 0;
+    color: #C9BDB2;
+    font-size: 14px;
+}
+
+.smak-big-btn {
+    background: #E4572E;
+    color: #ffffff !important;
+    text-decoration: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 8px 20px rgba(228, 87, 46, .28);
+}
+
+.smak-big-btn:hover {
+    background: #c2451f;
+}
+
+/* плитки з цифрами */
+.smak-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.smak-tile {
+    display: block;
+    background: var(--body-bg);
+    border: 1px solid var(--hairline-color);
+    border-left: 4px solid #E4572E;
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: var(--body-fg);
+    transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.smak-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(43, 35, 32, .10);
+}
+
+.smak-tile-label {
+    display: block;
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--body-quiet-color);
+    margin-bottom: 6px;
+}
+
+.smak-tile-value {
+    display: block;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.smak-tile-note {
+    display: block;
+    font-size: 12px;
+    color: var(--body-quiet-color);
+    margin-top: 4px;
+}
+
+/* панелі */
+.smak-panel {
+    background: var(--body-bg);
+    border: 1px solid var(--hairline-color);
+    border-radius: 14px;
+    padding: 6px 20px 16px;
+    margin-bottom: 20px;
+}
+
+.smak-panel-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--hairline-color);
+    padding: 14px 0 10px;
+    margin-bottom: 6px;
+}
+
+.smak-panel-head h2 {
+    margin: 0;
+    font-size: 15px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    background: none;
+    color: var(--body-fg);
+}
+
+.smak-panel-head a {
+    font-size: 13px;
+    color: #E4572E;
+    text-decoration: none;
+}
+
+/* стрічка замовлень */
+.smak-feed {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.smak-feed th {
+    text-align: left;
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--body-quiet-color);
+    padding: 8px 8px 8px 0;
+    border: 0;
+    font-weight: 600;
+}
+
+.smak-feed td {
+    padding: 10px 8px 10px 0;
+    border: 0;
+    border-top: 1px solid var(--hairline-color);
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.smak-feed td.num,
+.smak-feed th.num {
+    text-align: right;
+    padding-right: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+.smak-feed td.when {
+    text-align: right;
+    color: var(--body-quiet-color);
+    font-size: 13px;
+}
+
+.smak-feed a {
+    color: var(--link-fg);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+/* смужки популярних страв */
+.smak-bars {
+    list-style: none;
+    margin: 8px 0 0;
+    padding: 0;
+}
+
+.smak-bars li {
+    display: grid;
+    grid-template-columns: minmax(0, 220px) 1fr 34px;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 0;
+    border: 0;
+}
+
+.smak-bar-name {
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.smak-bar-track {
+    display: block;
+    height: 8px;
+    border-radius: 99px;
+    background: var(--hairline-color);
+    overflow: hidden;
+}
+
+.smak-bar-fill {
+    display: block;
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, #E4572E, #f08a5d);
+}
+
+.smak-bar-count {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    color: var(--body-quiet-color);
+}
+
+/* розділи */
+.smak-apps h2 {
+    font-size: 15px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    background: none;
+    color: var(--body-fg);
+    margin: 6px 0 12px;
+}
+
+.smak-apps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.smak-app {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid var(--hairline-color);
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: var(--body-fg);
+    background: var(--darkened-bg);
+}
+
+.smak-app:hover {
+    border-color: #E4572E;
+}
+
+.smak-app-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.smak-app-add {
+    font-size: 12px;
+    color: #E4572E;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+@media (max-width: 1100px) {
+    .smak-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .smak-apps-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+    .smak-tiles,
+    .smak-apps-grid { grid-template-columns: 1fr; }
+    .smak-hello { flex-direction: column; align-items: flex-start; }
+    .smak-bars li { grid-template-columns: 1fr 60px; }
+    .smak-bar-track { display: none; }
+}
+
+/* списки: картки, а не суцільна таблиця */
+#changelist .results table {
+    border: 0;
+    background: transparent;
+}
+
+#changelist .results thead th {
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid var(--hairline-color);
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--body-quiet-color);
+    padding: 10px 10px;
+}
+
+#changelist .results tbody tr {
+    background: var(--body-bg);
+}
+
+#changelist .results tbody td,
+#changelist .results tbody th {
+    border: 0;
+    border-bottom: 1px solid var(--hairline-color);
+    padding: 12px 10px;
+    vertical-align: middle;
+}
+
+#changelist .results tbody tr:hover td,
+#changelist .results tbody tr:hover th {
+    background: rgba(228, 87, 46, .06);
+}
+
+#changelist .results tbody tr.selected td,
+#changelist .results tbody tr.selected th {
+    background: rgba(228, 87, 46, .12);
+}
+
+#changelist .results {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--hairline-color);
+    background: var(--body-bg);
+}
+
+#changelist .actions {
+    background: transparent;
+    border: 0;
+    padding: 10px 0;
+}
+
+#changelist .actions select {
+    border-radius: 8px;
+    padding: 7px 10px;
+    border: 1px solid var(--hairline-color);
+}
+
+#changelist .actions .button {
+    border-radius: 8px;
+    padding: 8px 16px;
+}
+
+#changelist-search {
+    background: var(--darkened-bg);
+    border: 1px solid var(--hairline-color);
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+}
+
+#changelist-search input[type="text"] {
+    border-radius: 8px;
+}
+
+#changelist-filter {
+    background: var(--body-bg);
+    border: 1px solid var(--hairline-color);
+    border-radius: 12px;
+    padding: 4px 0 10px;
+    overflow: hidden;
+}
+
+#changelist-filter h2 {
+    border-radius: 0;
+    padding: 12px 16px;
+}
+
+#changelist-filter h3 {
+    padding: 10px 16px 2px;
+    font-size: 12px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--body-quiet-color);
+}
+
+#changelist-filter ul {
+    padding: 0 16px 6px;
+}
+
+/* картка редагування */
+.form-row {
+    border-bottom: 1px solid var(--hairline-color);
+    padding: 12px 0;
+}
+
+fieldset.module {
+    border-radius: 14px;
+    border: 1px solid var(--hairline-color);
+    overflow: hidden;
+    background: var(--body-bg);
+    margin-bottom: 18px;
+}
+
+fieldset.module h2 {
+    background: var(--darkened-bg);
+    color: var(--body-fg);
+    font-size: 13px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 12px 16px;
+}
+
+.aligned label {
+    font-weight: 600;
+    font-size: 13px;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="url"],
+input[type="number"],
+textarea,
+select {
+    border: 1px solid var(--hairline-color) !important;
+    border-radius: 9px !important;
+    padding: 9px 11px !important;
+    background: var(--body-bg);
+    color: var(--body-fg);
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+    border-color: #E4572E !important;
+    outline: 2px solid rgba(228, 87, 46, .2);
+}
+
+.submit-row {
+    border-radius: 14px;
+    border: 1px solid var(--hairline-color);
+    background: var(--darkened-bg);
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.submit-row input,
+.submit-row a.button {
+    border-radius: 9px;
+    padding: 10px 18px;
+}
+
+/* вхід */
+.login #container {
+    border-radius: 18px;
+    box-shadow: 0 24px 60px rgba(43, 35, 32, .16);
+    overflow: hidden;
+    border: 0;
+}
+
+.login #header {
+    background: #2B2320;
+    border-bottom: 3px solid #E4572E;
+}
+
+.login .form-row {
+    border: 0;
+}
+
+.login .submit-row {
+    background: transparent;
+    border: 0;
+    padding: 6px 0 0;
+}
+
+.login .submit-row input {
+    width: 100%;
+    background: #E4572E;
+    border-radius: 9px;
+    font-weight: 600;
+}
+
+/* повідомлення */
+.messagelist li {
+    border-radius: 10px;
+    margin: 0 0 10px;
+    padding: 12px 16px;
+}
+
+/* темна тема */
+html[data-theme="dark"] .smak-tile,
+html[data-theme="dark"] .smak-panel,
+html[data-theme="dark"] .smak-app,
+html[data-theme="dark"] #changelist .results {
+    background: var(--body-bg);
+}
+
+html[data-theme="dark"] #nav-sidebar {
+    background: #171311;
+}
+
+html[data-theme="dark"] .smak-hello {
+    background: linear-gradient(135deg, #241d1a 0%, #33261f 100%);
+}
+
+/* сайдбар: Django заливає рядки світлим — гасимо */
+#nav-sidebar table,
+#nav-sidebar thead,
+#nav-sidebar tbody,
+#nav-sidebar tr,
+#nav-sidebar th,
+#nav-sidebar td,
+#nav-sidebar .model-group,
+#nav-sidebar .model-user,
+#nav-sidebar .model-product,
+#nav-sidebar .model-order,
+#nav-sidebar .model-category,
+#nav-sidebar .model-review {
+    background: transparent !important;
+    border: 0 !important;
+}
+
+#nav-sidebar th a,
+#nav-sidebar td a,
+#nav-sidebar caption a,
+#nav-sidebar caption {
+    color: #F4EDE4 !important;
+    font-weight: 500;
+    letter-spacing: 0;
+    text-transform: none;
+    font-size: 13.5px;
+}
+
+#nav-sidebar caption a,
+#nav-sidebar caption {
+    color: #C9BDB2 !important;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
+#nav-sidebar .addlink,
+#nav-sidebar td a.addlink {
+    color: #E4572E !important;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+#nav-sidebar tr:hover th a,
+#nav-sidebar tr:hover td a {
+    color: #ffffff !important;
+}
+
+#nav-sidebar tr.current-model th a,
+#nav-sidebar tr.current-model td a {
+    color: #ffffff !important;
+}
+
+#nav-sidebar tr.model-group,
+#nav-sidebar tr.model-user {
+    border-radius: 8px;
+}
+
+#nav-sidebar tr th,
+#nav-sidebar tr td {
+    padding: 9px 8px;
+}
+
+#nav-sidebar div.module {
+    border: 0;
+    padding-bottom: 6px;
+}
+
+#nav-sidebar caption {
+    padding: 16px 12px 8px;
+}
+
+/* дашборд: прибираємо дубль заголовка і подвійне «№» */
+.smak-dashboard #content > h1 {
+    display: none;
+}
+
+.smak-dashboard .smak-hello h1 {
+    font-size: 26px;
+    line-height: 1.2;
+}
+
+/* редактор: fieldset читабельніший */
+fieldset.module {
+    border: 1px solid var(--hairline-color) !important;
+}
+
+fieldset.module h2 {
+    border: 0 !important;
+    border-bottom: 1px solid var(--hairline-color) !important;
+}
+
+.aligned .form-row {
+    padding: 12px 16px;
+}
+
+/* виправлені вертикальні риски карток */
+.form-row fieldset.module .form-row:last-child {
+    border-bottom: 0;
+}
+
+/* читабельність заголовка в темній картці */
+#content .smak-hello h1,
+.smak-hello h1 {
+    color: #ffffff !important;
+    font-size: 26px;
+    line-height: 1.2;
+    margin: 0 0 6px;
+}
+
+/* сайдбар ширший і без переносів */
+#nav-sidebar {
+    width: 272px;
+    flex: 0 0 272px;
+    min-height: 100vh;
+}
+
+#nav-sidebar th,
+#nav-sidebar td {
+    white-space: nowrap;
+}
+
+#nav-sidebar th a,
+#nav-sidebar td a {
+    font-size: 13px;
+}
+
+#nav-sidebar td a.addlink {
+    font-size: 10.5px;
+    letter-spacing: .04em;
+}
+
+#nav-sidebar tr th,
+#nav-sidebar tr td {
+    padding: 8px 6px;
+}
+
+/* поле пошуку в сайдбарі */
+#nav-sidebar input[type="search"],
+#nav-sidebar input[type="text"] {
+    width: calc(100% - 24px);
+    box-sizing: border-box;
+    background: #3A302B !important;
+    border: 1px solid #4A3E37 !important;
+    color: #F4EDE4 !important;
+    border-radius: 8px;
+    padding: 7px 10px;
+    margin: 8px 12px;
+}
+
+#nav-sidebar input[type="search"]::placeholder {
+    color: #9c8f86;
+}
+
+/* темна смуга сайдбара на всю висоту */
+#main > #nav-sidebar {
+    background: #2B2320;
+}
+
+/* хлібні крихти на темній смузі */
+.breadcrumbs {
+    background: #241d1a !important;
+    color: #C9BDB2 !important;
+    padding: 12px 20px;
+}
+
+.breadcrumbs a,
+.breadcrumbs a:link,
+.breadcrumbs a:visited {
+    color: #F4EDE4 !important;
+}
+
+.breadcrumbs a:hover {
+    color: #E4572E !important;
+}
+
+/* панель дій і фільтр не тиснуть таблицю */
+#changelist .actions select {
+    min-width: 250px;
+    max-width: 340px;
+}
+
+#changelist-filter {
+    width: 238px;
+    flex: 0 0 238px;
+}
+
+#changelist {
+    gap: 18px;
+}
+
+#changelist .results {
+    overflow-x: auto;
+}
+
+#changelist .results table {
+    min-width: 640px;
+}
+
+/* кнопка «Виконати» поруч із дією */
+#changelist .actions button,
+#changelist .actions .button {
+    border-radius: 8px;
+    padding: 7px 14px;
+    background: #2B2320;
+    color: #fff;
+    border: 0;
+    cursor: pointer;
+}
+
+#changelist .actions button:hover,
+#changelist .actions .button:hover {
+    background: #E4572E;
+}

@@ -1,0 +1,102 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block bodyclass %}{{ block.super }} smak-dashboard{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+
+  <div class="smak-hello">
+    <div>
+      <p class="smak-hi-day" id="smak-day">Смачного дня!</p>
+      <h1>СМАК · панель керування</h1>
+      <p class="smak-hi-sub">Замовлення, меню та відгуки в одному місці</p>
+    </div>
+    <a class="smak-big-btn" href="{% url 'admin:store_order_add' %}">+ Нове замовлення</a>
+  </div>
+
+  <div class="smak-tiles">
+    {% for card in smak_cards %}
+    <a class="smak-tile" href="{{ card.url }}">
+      <span class="smak-tile-label">{{ card.label }}</span>
+      <span class="smak-tile-value">{{ card.value }}</span>
+      <span class="smak-tile-note">{{ card.note }}</span>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if smak_feed %}
+  <div class="smak-panel">
+    <div class="smak-panel-head">
+      <h2>Останні замовлення</h2>
+      <a href="{% url 'admin:store_order_changelist' %}">усі →</a>
+    </div>
+    <table class="smak-feed">
+      <thead>
+        <tr><th>№</th><th>Гість</th><th>Статус</th><th class="num">Сума</th><th class="when">Коли</th></tr>
+      </thead>
+      <tbody>
+        {% for row in smak_feed %}
+        <tr>
+          <td><a href="{{ row.url }}">{{ row.number }}</a></td>
+          <td>{{ row.name }}</td>
+          <td><span class="order-status status-{{ row.status_class }}">{{ row.status_label }}</span></td>
+          <td class="num">{{ row.total }}</td>
+          <td class="when">{{ row.created }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if smak_popular %}
+  <div class="smak-panel">
+    <div class="smak-panel-head">
+      <h2>Що замовляють найчастіше</h2>
+      <a href="{% url 'admin:store_product_changelist' %}">меню →</a>
+    </div>
+    <ul class="smak-bars">
+      {% for row in smak_popular %}
+      <li>
+        <span class="smak-bar-name">{{ row.name }}</span>
+        <span class="smak-bar-track"><span class="smak-bar-fill" style="width: {{ row.percent }}%"></span></span>
+        <span class="smak-bar-count">{{ row.count }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  <div class="smak-apps">
+    <h2>Розділи</h2>
+    <div class="smak-apps-grid">
+      {% for app in app_list %}
+        {% for model in app.models %}
+        <a class="smak-app" href="{{ model.admin_url }}">
+          <span class="smak-app-name">{{ model.name }}</span>
+          {% if model.add_url %}<span class="smak-app-add">додати</span>{% endif %}
+        </a>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var hour = new Date().getHours();
+  var el = document.getElementById('smak-day');
+  if (!el) return;
+  if (hour < 5) el.textContent = 'Працюєте вночі? Тоді кава за нами';
+  else if (hour < 12) el.textContent = 'Смачного ранку!';
+  else if (hour < 18) el.textContent = 'Смачного дня!';
+  else el.textContent = 'Смачного вечора!';
+})();
+</script>
+{% endblock %}
